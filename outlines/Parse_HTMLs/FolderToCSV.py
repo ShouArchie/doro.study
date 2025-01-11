@@ -83,7 +83,7 @@ def parse_course_outline_to_json(api_key, html_file_path):
     """
     
     retries = 0
-    max_retries = 10  # Limit the number of retries
+    max_retries = 12  # Limit the number of retries
     backoff = 1  # Initial wait time in seconds
 
     while retries < max_retries:
