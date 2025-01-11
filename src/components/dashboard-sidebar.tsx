@@ -1,6 +1,6 @@
 "use client"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupAction, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarInset, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarRail, useSidebar } from "@/components/ui/sidebar";
+import { SidebarTrigger, Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupAction, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarInset, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarRail, useSidebar } from "@/components/ui/sidebar";
 import { ChevronDown, ChevronRight, ChevronsUpDown, ChevronUp, Home, Loader2, LogOut, Plus, Search, Settings } from "lucide-react";
 import { useEffect, useState, useTransition } from "react";
 import { User } from "@supabase/supabase-js";
@@ -10,6 +10,7 @@ import { toast } from "@/hooks/use-toast";
 import { Skeleton } from "./ui/skeleton";
 import { navigate } from "@/actions/redirect";
 import React from "react";
+
 
 interface SidebarProps {
     user: User | null | undefined,
@@ -129,6 +130,7 @@ export default function DashboardSidebar({ user, loading }: SidebarProps) {
             <SidebarContent>
                 <SidebarGroup>
                     <SidebarMenu>
+                        <SidebarTrigger className="-ml-1 mx-2 my-4 px-2" />
                         {items.map((item) => (
                             <SidebarMenuItem key={item.title}>
                                 <SidebarMenuButton asChild>
