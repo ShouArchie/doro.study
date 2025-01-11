@@ -39,7 +39,7 @@ class Assessment(typing.TypedDict):
     drop: int
     symbol: str # one letter please
     weight: str
-    grade: float
+    grade: list[float]
     date: list[str]
 
 class Scheme(typing.TypedDict):
@@ -72,11 +72,12 @@ def parse_course_outline_to_json(api_key, html_file_path):
 
     input = f"""Parse the HTML course outline into JSON with the following rules:
     1. Course code format example: "ECE 105"
-    2. Symbols should be single characters, unique for each assessment type.
+    2. Symbols should be single characters, unique for each assessment type. condition symbol MUST match the symbol of one of the assessments
     3. Assessment weight is a float (0.3 for 30%), unless it is a function, which should then be expressed as an equation with the one letter symbols representing the marks in other assessments
-    4. Leave grade as -1.0
-    5. Leave date as "none"
+    4. Leave grade as [-1.0]
+    5. Leave date as ["none"]
     6. If email not provided, [string ID]@uwaterloo.ca, eg. a6lian@uwaterloo.ca
+    7. If there is only one grading scheme, the bounds should be 0 and 100
     The html is attached: \n
     {html_content}
     """
