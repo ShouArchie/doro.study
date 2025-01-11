@@ -23,7 +23,7 @@ export function UpcomingSummativesTable({ summatives }) {
         <CardDescription>Your next assessments</CardDescription>
       </CardHeader>
       <CardContent className="flex flex-grow overflow-hidden">
-        <ScrollArea className="h-[100%] w-full">
+        <ScrollArea className="h-[310px] w-full">
           <div className="max-h-[calc(100vh-12rem)]">
             <Table>
               <TableHeader>
@@ -34,7 +34,7 @@ export function UpcomingSummativesTable({ summatives }) {
                   <TableHead className="sticky top-0 bg-background z-10">Type</TableHead>
                 </TableRow>
               </TableHeader>
-              <TableBody>
+              <TableBody className="h-full">
                 {summatives.map((summative, index) => (
                   <TableRow key={index}>
                     <TableCell>{summative.date}</TableCell>

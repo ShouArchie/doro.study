@@ -156,6 +156,10 @@ export default function SearchPage(){
             duration: 0.5,
         })
 
+        // useEffect(() => {
+            
+        // })
+
     })
 
     const [faculty, setFaculty] = useState(faculties[0])
