@@ -28,10 +28,10 @@ export default function Dashboard() {
           { date: "01/02/2025", course: "History", grade: 80 },
           { date: "01/02/2025", course: "Art", grade: 90 },
           { date: "01/02/2025", course: "Engineering", grade: 78 },
-          { date: "01/18/2025", course: "Math", grade: 85 },
+          { date: "01/13/2025", course: "Math", grade: 85 },
           { date: "01/18/2025", course: "Science", grade: 78 },
           { date: "01/18/2025", course: "English", grade: 86 },
-          { date: "01/18/2025", course: "History", grade: 82 },
+          { date: "01/12/2025", course: "History", grade: 82 },
           { date: "01/18/2025", course: "Art", grade: 92 },
           { date: "01/18/2025", course: "Engineering", grade: 80 },
           { date: "02/10/2025", course: "Math", grade: 88 },
@@ -129,8 +129,8 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="flex flex-col lg:flex-row gap-4 h-[calc(100vh-9rem)] p-4">
-      <div className="flex-grow lg:w-2/3">
+    <div className="flex flex-col lg:flex-row gap-4 h-[calc(100vh-10rem)] max-w-fit p-4">
+      <div className="flex-grow lg:w-3/4">
         <GradetimeChart 
           gradeUpdates={gradeUpdates}
           courses={courses} 
@@ -138,7 +138,7 @@ export default function Dashboard() {
           onToggleCourse={handleToggleCourse}
         />
       </div>
-      <div className="lg:w-1/3 flex flex-col gap-4">
+      <div className="lg:w-1/4 flex flex-col gap-4">
         <div className="flex-grow-0">
           <YearProgressChart />
         </div>
