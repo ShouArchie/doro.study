@@ -24,6 +24,7 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { getChartColors } from "@/components/ui/helpers";
 import { parse, format, isValid, compareAsc } from 'date-fns';
+import { Skeleton } from './ui/skeleton';
 
 const parseDate = (dateString: string | undefined) => {
   if (!dateString) return new Date(NaN);
@@ -49,13 +50,14 @@ interface GradeUpdate {
 }
 
 interface GradetimeChartProps {
-  gradeUpdates: GradeUpdate[];
-  courses: string[];
-  visibleCourses: Record<string, boolean>;
-  onToggleCourse: (course: string) => void;
+  gradeUpdates: GradeUpdate[],
+  courses: string[],
+  visibleCourses: Record<string, boolean>,
+  isLoading: boolean,
+  onToggleCourse: (course: string) => void,
 }
 
-export function GradetimeChart({ gradeUpdates, courses, visibleCourses, onToggleCourse }: GradetimeChartProps) {
+export function GradetimeChart({ gradeUpdates, courses, visibleCourses, onToggleCourse, isLoading }: GradetimeChartProps) {
   const colors = getChartColors();
   const chartConfig = courses.reduce((acc, course, index) => {
     acc[course] = {
@@ -130,8 +132,16 @@ export function GradetimeChart({ gradeUpdates, courses, visibleCourses, onToggle
   return (
     <Card className="flex flex-col">
       <CardHeader className="flex-shrink-0">
-        <CardTitle>Course Performance</CardTitle>
-        <CardDescription>Grade Trends Over Time</CardDescription>
+        {isLoading?
+        <>
+          <Skeleton className="h-12 w-12 rounded-full" />
+        </> 
+        :
+        <>
+          <CardTitle>Course Performance</CardTitle>
+          <CardDescription>Grade Trends Over Time</CardDescription>
+        </>
+      }
       </CardHeader>
       <CardContent className="">
         <div className="mb-4">

@@ -23,8 +23,8 @@ export function UpcomingSummativesTable({ summatives }) {
         <CardDescription>Your next assessments</CardDescription>
       </CardHeader>
       <CardContent className="flex-grow">
-        <ScrollArea className="h-2/6">
-          <Table>
+        <ScrollArea className="w-full h-full">
+          <Table className="max-h-">
             <TableHeader>
               <TableRow>
                 <TableHead className="sticky top-0 bg-background z-10">Date</TableHead>

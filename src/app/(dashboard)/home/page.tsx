@@ -125,30 +125,25 @@ export default function Dashboard() {
   };
 
   return (
-    <>
-      {isLoading ? (
-        <div>Loading</div>
-      ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 p-4 h-[calc(100vh-2rem)]">
-          <div className="lg:col-span-3 h-full w-full">
-            <GradetimeChart
-              gradeUpdates={gradeUpdates}
-              courses={courses}
-              visibleCourses={visibleCourses}
-              onToggleCourse={handleToggleCourse}
-            />
-          </div>
-          <div className="lg:col-span-1 flex flex-col h-full">
-            <div className="mb-4">
-              <YearProgressChart />
-            </div>
-            <div className="">
-              <UpcomingSummativesTable summatives={upcomingSummatives} />
-            </div>
-          </div>
+    <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 m-4">
+      <div className="lg:col-span-3">
+        <GradetimeChart
+          gradeUpdates={gradeUpdates}
+          courses={courses}
+          isLoading={isLoading} 
+          visibleCourses={visibleCourses}
+          onToggleCourse={handleToggleCourse}
+        />
+      </div>
+      <div className="lg:col-span-1 flex flex-col gap-4">
+        <div className="">
+          <YearProgressChart />
         </div>
-      )}
-    </>
+        <div className="">
+          <UpcomingSummativesTable summatives={upcomingSummatives} />
+        </div>
+      </div>
+    </div>
   );
 }
 
