@@ -127,7 +127,7 @@ export default function DashboardSidebar({ user, loading }: SidebarProps) {
     return (
         <Sidebar variant="sidebar" collapsible="icon">
             <SidebarHeader>
-            <SidebarTrigger className="-ml-1 mx-0.5 my-2 px-2" />
+            <SidebarTrigger className="-ml-1 mx-0.5 px-2" />
                 </SidebarHeader> 
             <SidebarContent>
                 <SidebarGroup>

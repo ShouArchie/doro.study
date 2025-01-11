@@ -41,7 +41,7 @@ export function YearProgressChart() {
   } satisfies ChartConfig;
 
   return (
-    <Card className="w-full h-full flex flex-col">
+    <Card className="w-full flex flex-col">
       <CardHeader className="text-center">
         <CardTitle>Semester Progress</CardTitle>
         <CardDescription>{semester} Semester {dates.start.getFullYear()}</CardDescription>
