@@ -71,6 +71,7 @@ def parse_course_outline_to_json(api_key, html_file_path):
         html_content = file.read()
 
     input = f"""Parse the HTML course outline into JSON with the following rules:
+    0. Assessment count is the number of [x assessment], drop is the number of [x assessment] to drop
     1. Course code format example: "ECE 105"
     2. Symbols should be single characters, unique for each assessment type. condition symbol MUST match the symbol of one of the assessments
     3. Assessment weight is a float (0.3 for 30%), unless it is a function, which should then be expressed as an equation with the one letter symbols representing the marks in other assessments
@@ -129,16 +130,20 @@ def generate_csv_subject(input_folder, output_csv, api_key):
 
 
 def generate_json_procedural(input_folder, output_folder, api_key):
+    start_processing = False  # Flag to control when to start
     for folder_name in os.listdir(input_folder):
-        folder_path = os.path.join(input_folder, folder_name)
-        output_json = os.path.join(output_folder, f"{folder_name}.csv")
-        print(folder_path)
-        generate_csv_subject(folder_path, output_json, api_key)
+        if folder_name == "OPTOM":
+            start_processing = True
+        if start_processing == True:
+            folder_path = os.path.join(input_folder, folder_name)
+            output_json = os.path.join(output_folder, f"{folder_name}.csv")
+            print(folder_path)
+            generate_csv_subject(folder_path, output_json, api_key)
 
 
 if __name__ == "__main__":
     # Replace with your actual API key
-    api_key = os.getenv('GEMINI_API_KEY')
+    api_key = os.getenv('GEMINI_API_KEY_2')
 
     if not api_key:
         raise ValueError("API key not found. Make sure GEMINI_API_KEY is set in the .env file.")
