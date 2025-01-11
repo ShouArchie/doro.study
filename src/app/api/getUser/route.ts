@@ -10,7 +10,7 @@ export async function GET(){
 
         if (error) {
             console.error("Error fetching user", error.message);
-            // return NextResponse.json({ error: error.message }, { status: 400 });
+            return NextResponse.json({ error: error.message }, { status: 400 });
         }
 
         if (!data || !data.user) {
