@@ -19,10 +19,27 @@ import {
   ChartConfig,
   ChartContainer,
   ChartTooltip,
-  ChartTooltipContent,
 } from "@/components/ui/chart";
 import { Checkbox } from "@/components/ui/checkbox";
 import { getChartColors } from "@/components/ui/helpers";
+import { parse, format, isValid, compareAsc } from 'date-fns';
+
+const parseDate = (dateString: string | undefined) => {
+  if (!dateString) return new Date(NaN);
+  
+  const formats = ['yyyy-MM-dd', 'MM/dd/yyyy', 'MMM d', 'MMMM d', 'MMM d yyyy', 'MMMM d yyyy'];
+  for (const fmt of formats) {
+    const date = parse(dateString, fmt, new Date());
+    if (isValid(date)) {
+      return date;
+    }
+  }
+  return new Date(NaN);
+};
+
+const formatDate = (date: Date) => {
+  return isValid(date) ? format(date, 'MMM d, yyyy') : 'Invalid Date';
+};
 
 interface GradetimeChartProps {
   chartData: any[];
@@ -46,7 +63,11 @@ export function GradetimeChart({ chartData, courses, visibleCourses, onToggleCou
     color: "hsl(var(--primary))",
   };
 
-  const averageData = chartData.map((dataPoint) => {
+  const sortedData = [...chartData]
+    .filter(dataPoint => isValid(parseDate(dataPoint.date)))
+    .sort((a, b) => compareAsc(parseDate(a.date), parseDate(b.date)));
+
+  const averageData = sortedData.map((dataPoint) => {
     const visibleCourseValues = courses
       .filter((course) => visibleCourses[course])
       .map((course) => dataPoint[course] || 0);
@@ -56,22 +77,28 @@ export function GradetimeChart({ chartData, courses, visibleCourses, onToggleCou
     return {
       ...dataPoint,
       average: Number(average.toFixed(2)),
+      parsedDate: parseDate(dataPoint.date),
     };
   });
 
+  console.log("Processed data:", averageData); // Debug log
+
   const calculateYAxisDomain = () => {
     const allValues = averageData.flatMap(dataPoint => 
-      Object.values(dataPoint).filter(value => typeof value === 'number')
+      courses.map(course => dataPoint[course]).filter(value => typeof value === 'number')
     );
     const minValue = Math.min(...allValues);
     const maxValue = Math.max(...allValues);
     const lowerBound = Math.max(0, Math.floor((minValue - 5) / 10) * 10);
-    const upperBound = Math.ceil(maxValue / 10) * 10;
+    const upperBound = Math.min(100, Math.ceil((maxValue + 5) / 10) * 10);
     return [lowerBound, upperBound];
   };
 
+  const yAxisDomain = calculateYAxisDomain();
+  console.log("Y-axis domain:", yAxisDomain); // Debug log
+
   return (
-    <Card className="w-full h-[600px] md:h-[700px] lg:h-[800px]">
+    <Card className="w-full h-full">
       <CardHeader>
         <CardTitle>Course Performance</CardTitle>
         <CardDescription>Grade Trends Over Time</CardDescription>
@@ -110,7 +137,7 @@ export function GradetimeChart({ chartData, courses, visibleCourses, onToggleCou
             </div>
           </div>
         </div>
-        <div className="h-[calc(100%-4rem)]">
+        <div className="h-[calc(100%-5rem)]">
           <ChartContainer config={chartConfig} className="h-full">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart
@@ -119,21 +146,38 @@ export function GradetimeChart({ chartData, courses, visibleCourses, onToggleCou
               >
                 <CartesianGrid strokeDasharray="3 3" opacity={0.1} />
                 <XAxis
-                  dataKey="month"
+                  dataKey="parsedDate"
                   tickLine={false}
                   axisLine={false}
                   tickMargin={8}
-                  tickFormatter={(value) => value.slice(0, 3)}
+                  tickFormatter={(value) => isValid(value) ? format(value, 'MMM d') : ''}
                   stroke="hsl(var(--muted-foreground))"
                 />
                 <YAxis
-                  domain={calculateYAxisDomain()}
+                  domain={yAxisDomain}
                   tickCount={6}
                   tickFormatter={(value) => `${value}%`}
                   stroke="hsl(var(--muted-foreground))"
                   label={{ value: "Grade (%)", angle: -90, position: 'insideLeft', style: { textAnchor: 'middle' } }}
                 />
-                <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
+                <ChartTooltip
+                  cursor={false}
+                  content={({ active, payload, label }) => {
+                    if (active && payload && payload.length) {
+                      return (
+                        <div className="bg-background border border-border p-2 rounded shadow">
+                          <p className="font-bold">{formatDate(label)}</p>
+                          {payload.map((entry, index) => (
+                            <p key={index} style={{ color: entry.color }}>
+                              {entry.name}: {entry.value}%
+                            </p>
+                          ))}
+                        </div>
+                      );
+                    }
+                    return null;
+                  }}
+                />
                 {courses.map((course) => (
                   visibleCourses[course] && (
                     <Line
