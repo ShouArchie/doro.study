@@ -51,55 +51,43 @@ export function YearProgressChart() {
           config={dynamicChartConfig}
           className="w-full h-full"
         >
-          <ResponsiveContainer width="100%" height="100%">
-            <RadialBarChart
-              data={dynamicChartData}
-              startAngle={90}
-              endAngle={360*semesterProgress/100+90}
-              innerRadius="65%"
-              outerRadius="90%"
-            >
-              <PolarGrid
-                gridType="circle"
-                radialLines={false}
-                stroke="none"
-                polarRadius={[74, 64]}
-                className="first:fill-muted last:fill-background"
-              />
+          <RadialBarChart
+            data={dynamicChartData}
+            startAngle={90}
+            endAngle={360*semesterProgress/100+90}
+            innerRadius={65}
+            outerRadius={82.5}
+          >
+            <PolarGrid
+              gridType="circle"
+              radialLines={false}
+              stroke="none"
+              className="first:fill-muted last:fill-background"
+              polarRadius={[69, 61]}
+            />
               <RadialBar dataKey="percentage" background cornerRadius={10}/>
               <PolarRadiusAxis tick={false} tickLine={false} axisLine={false}>
                 <Label
                   content={({ viewBox }) => {
                     if (viewBox && "cx" in viewBox && "cy" in viewBox) {
                       return (
-                        <text
-                          x={viewBox.cx}
-                          y={viewBox.cy}
-                          textAnchor="middle"
-                          dominantBaseline="middle"
-                        >
-                          <tspan
+                        <g>
+                          <text
                             x={viewBox.cx}
                             y={viewBox.cy}
+                            textAnchor="middle"
+                            dominantBaseline="central"
                             className="fill-foreground text-5xl font-bold"
                           >
                             {semesterProgress}%
-                          </tspan>
-                          <tspan
-                            x={viewBox.cx}
-                            y={(viewBox.cy || 0) + 30}
-                            className="fill-muted-foreground text-lg"
-                          >
-                            Done
-                          </tspan>
-                        </text>
+                          </text>
+                        </g>
                       );
                     }
                   }}
                 />
               </PolarRadiusAxis>
             </RadialBarChart>
-          </ResponsiveContainer>
         </ChartContainer>
       </CardContent>
       <CardFooter className="flex-col gap-2 text-sm text-center">

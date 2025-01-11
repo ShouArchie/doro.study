@@ -17,14 +17,13 @@ import { ScrollArea } from "./ui/scroll-area";
 
 export function UpcomingSummativesTable({ summatives }) {
   return (
-      <Card className="overflow-x-hidden">
-        <CardHeader className="pb-3">
-          <CardTitle>Upcoming Deliverables</CardTitle>
-          <CardDescription>Your next assessments</CardDescription>
-        </CardHeader>
-        <CardContent>
-          {/* <div className="max-h-[270px] overflow-auto pr-2 custom-scrollbar"> */}
-          <ScrollArea>
+    <Card className="flex flex-col custom-scrollbar">
+      <CardHeader className="flex-shrink-0">
+        <CardTitle>Upcoming Deliverables</CardTitle>
+        <CardDescription>Your next assessments</CardDescription>
+      </CardHeader>
+      <CardContent className="flex-grow">
+        <ScrollArea className="h-2/6">
           <Table>
             <TableHeader>
               <TableRow>
@@ -44,8 +43,8 @@ export function UpcomingSummativesTable({ summatives }) {
                 </TableRow>
               ))}
             </TableBody>
-        </Table>
-      </ScrollArea>
+          </Table>
+        </ScrollArea>
       </CardContent>
     </Card>
   );
