@@ -6,6 +6,7 @@ import typing_extensions as typing
 import enum
 import csv
 import json
+import time
 
 load_dotenv()
 
@@ -48,9 +49,7 @@ class Course(typing.TypedDict):
     code: str
     schemes: list[Scheme]
 
-
 def parse_course_outline_to_json(api_key, html_file_path):
-
     # Ensure the file exists
     if not os.path.exists(html_file_path):
         raise FileNotFoundError(f"File not found: {html_file_path}")
@@ -60,21 +59,46 @@ def parse_course_outline_to_json(api_key, html_file_path):
         html_content = file.read()
 
     input = f"""Parse the HTML course outline into JSON with the following rules:
+    0. Course code format example: "ECE 105"
     1. Use a single grading scheme if there are no conditional rules.
     2. Symbols should be single characters, unique for each assessment type.
     3. Assessment weight is a float (0.3 for 30%), unless it is a function, which should then be expressed as an equation with the one letter symbols representing the marks in other assessments
     The html is attached: \n
     {html_content}
     """
-    # Send the request to Gemini API
-    response = model.generate_content(input, generation_config=genai.GenerationConfig(
-        response_mime_type="application/json", response_schema=Course),)
+    
+    retries = 0
+    max_retries = 10  # Limit the number of retries
+    backoff = 1  # Initial wait time in seconds
 
-    # Check if the response contains content and return it
-    if response and hasattr(response, 'text'):
-        return response.text
-    else:
-        raise Exception("API request failed or did not return expected content.")
+    while retries < max_retries:
+        try:
+            # Send the request to Gemini API
+            response = model.generate_content(
+                input, 
+                generation_config=genai.GenerationConfig(
+                    response_mime_type="application/json", 
+                    response_schema=Course
+                ),
+            )
+            
+            # Check if the response contains content and return it
+            if response and hasattr(response, 'text'):
+                return response.text
+            else:
+                raise Exception("API request failed or did not return expected content.")
+        
+        except Exception as e:
+            # Check if it's a 429 error (rate limit exceeded)
+            if "429" in str(e) or "Resource has been exhausted" in str(e):
+                print(f"Rate limit hit. Retrying in {backoff} seconds...")
+                time.sleep(backoff)
+                retries += 1
+                backoff *= 2  # Exponential backoff
+            else:
+                raise  # Re-raise other exceptions
+
+    raise Exception("Max retries exceeded. Could not complete the API call.")
 
 
 def generate_csv_all(input_folder, output_csv, api_key):
@@ -106,6 +130,20 @@ def generate_csv_subject(input_folder, output_csv, api_key):
                 course_json = parse_course_outline_to_json(api_key, file_path)
                 csvwriter.writerow([json.dumps(course_json)])  # Write each parsed JSON to the CSV
 
+def generate_json_subject(input_folder, output_json, api_key):
+    all_data = []  # List to store all parsed JSON objects
+
+    for file_name in os.listdir(input_folder):
+        if file_name.endswith('.html'):
+            file_path = os.path.join(input_folder, file_name)
+            print("Processing: " + file_path)
+            # Assuming `parse_course_outline_to_json` is a function that parses the HTML and returns JSON
+            course_json = parse_course_outline_to_json(api_key, file_path)
+            all_data.append(course_json)  # Add each parsed JSON to the list
+
+    # Write the list of JSON objects to the output file
+    with open(output_json, 'w', encoding='utf-8') as jsonfile:
+        json.dump(all_data, jsonfile, ensure_ascii=False, indent=4)
 
 
 if __name__ == "__main__":
@@ -116,11 +154,11 @@ if __name__ == "__main__":
         raise ValueError("API key not found. Make sure GEMINI_API_KEY is set in the .env file.")
 
     # Path to the HTML file you want to parse
-    html_folder_path = "outlines\\HTML_Files\\ECE"
-    output_csv_path = "outlines\\ECE_JSON2.csv"  # Replace with your desired output file name
+    html_folder_path = "outlines\\SimplifiedHTMLFiles\\ECE"
+    output_csv_path = "outlines\\ECE_JSON3.csv"  # Replace with your desired output file name
 
     try:
-        generate_csv_subject(html_folder_path, output_csv_path, api_key)
+        generate_json_subject(html_folder_path, output_csv_path, api_key)
         # print("Parsed JSON from the course outline:")
     except Exception as e:
         print(f"An error occurred: {e}")

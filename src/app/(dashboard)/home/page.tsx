@@ -5,38 +5,94 @@ import { GradetimeChart } from "@/components/GradetimeChart";
 import { YearProgressChart } from "@/components/YearProgressChart";
 import { UpcomingSummativesTable } from "@/components/UpcomingSummativesTable";
 
+interface GradeUpdate {
+  date: string;
+  course: string;
+  grade: number;
+}
+
 export default function Dashboard() {
-  const [chartData, setChartData] = useState([]);
-  const [courses, setCourses] = useState([]);
-  const [visibleCourses, setVisibleCourses] = useState({});
+  const [gradeUpdates, setGradeUpdates] = useState<GradeUpdate[]>([]);
+  const [courses, setCourses] = useState<string[]>([]);
+  const [visibleCourses, setVisibleCourses] = useState<Record<string, boolean>>({});
   const [isLoading, setIsLoading] = useState(true);
   const [upcomingSummatives, setUpcomingSummatives] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const mockChartData = [
-          { date: "Sep 1, 2024", Math: 82, Science: 75, English: 88, History: 80, Art: 90, Engineering: 78 },
-          { date: "10/15/2024", Math: 85, Science: 78, English: 86, History: 82, Art: 92, Engineering: 80 },
-          { date: "November 20", Math: 88, Science: 80, English: 89, History: 85, Art: 91, Engineering: 99 },
-          { date: "2024-12-18", Math: 86, Science: 82, English: 90, History: 83, Art: 93, Engineering: 85 },
-          { date: "Jan 22", Math: 89, Science: 84, English: 88, History: 86, Art: 92, Engineering: 87 },
-          { date: "February 28, 2025", Math: 91, Science: 86, English: 92, History: 88, Art: 94, Engineering: 89 },
-          { date: "Mar 25", Math: 93, Science: 88, English: 91, History: 90, Art: 95, Engineering: 91 },
-          { date: "04/18/2025", Math: 90, Science: 87, English: 93, History: 89, Art: 96, Engineering: 90 },
-          { date: "May 20", Math: 92, Science: 89, English: 94, History: 91, Art: 97, Engineering: 92 },
-          { date: "2025-06-15", Math: 95, Science: 91, English: 96, History: 93, Art: 98, Engineering: 94 }
+        const mockGradeUpdates: GradeUpdate[] = [
+          { date: "01/02/2025", course: "Math", grade: 82 },
+          { date: "01/02/2025", course: "Science", grade: 75 },
+          { date: "01/02/2025", course: "English", grade: 88 },
+          { date: "01/02/2025", course: "History", grade: 80 },
+          { date: "01/02/2025", course: "Art", grade: 90 },
+          { date: "01/02/2025", course: "Engineering", grade: 78 },
+          { date: "01/13/2025", course: "Math", grade: 85 },
+          { date: "01/18/2025", course: "Science", grade: 78 },
+          { date: "01/18/2025", course: "English", grade: 86 },
+          { date: "01/12/2025", course: "History", grade: 82 },
+          { date: "01/18/2025", course: "Art", grade: 92 },
+          { date: "01/18/2025", course: "Engineering", grade: 80 },
+          { date: "02/10/2025", course: "Math", grade: 88 },
+          { date: "02/10/2025", course: "Science", grade: 80 },
+          { date: "02/10/2025", course: "English", grade: 89 },
+          { date: "02/10/2025", course: "History", grade: 85 },
+          { date: "02/10/2025", course: "Art", grade: 91 },
+          { date: "02/10/2025", course: "Engineering", grade: 99 },
+          { date: "02/20/2025", course: "Math", grade: 86 },
+          { date: "02/20/2025", course: "Science", grade: 82 },
+          { date: "02/20/2025", course: "English", grade: 90 },
+          { date: "02/20/2025", course: "History", grade: 83 },
+          { date: "02/20/2025", course: "Art", grade: 93 },
+          { date: "02/20/2025", course: "Engineering", grade: 85 },
+          { date: "03/01/2025", course: "Math", grade: 89 },
+          { date: "03/01/2025", course: "Science", grade: 84 },
+          { date: "03/01/2025", course: "English", grade: 88 },
+          { date: "03/01/2025", course: "History", grade: 86 },
+          { date: "03/01/2025", course: "Art", grade: 92 },
+          { date: "03/01/2025", course: "Engineering", grade: 87 },
+          { date: "03/13/2025", course: "Math", grade: 91 },
+          { date: "03/13/2025", course: "Science", grade: 86 },
+          { date: "03/13/2025", course: "English", grade: 92 },
+          { date: "03/13/2025", course: "History", grade: 88 },
+          { date: "03/13/2025", course: "Art", grade: 94 },
+          { date: "03/13/2025", course: "Engineering", grade: 89 },
+          { date: "03/28/2025", course: "Math", grade: 93 },
+          { date: "03/28/2025", course: "Science", grade: 88 },
+          { date: "03/28/2025", course: "English", grade: 91 },
+          { date: "03/28/2025", course: "History", grade: 90 },
+          { date: "03/28/2025", course: "Art", grade: 95 },
+          { date: "03/28/2025", course: "Engineering", grade: 91 },
+          { date: "04/02/2025", course: "Math", grade: 90 },
+          { date: "04/02/2025", course: "Science", grade: 87 },
+          { date: "04/02/2025", course: "English", grade: 93 },
+          { date: "04/02/2025", course: "History", grade: 89 },
+          { date: "04/02/2025", course: "Art", grade: 96 },
+          { date: "04/02/2025", course: "Engineering", grade: 90 },
+          { date: "04/12/2025", course: "Math", grade: 92 },
+          { date: "04/12/2025", course: "Science", grade: 89 },
+          { date: "04/12/2025", course: "English", grade: 94 },
+          { date: "04/12/2025", course: "History", grade: 91 },
+          { date: "04/12/2025", course: "Art", grade: 97 },
+          { date: "04/12/2025", course: "Engineering", grade: 92 },
+          { date: "04/30/2025", course: "Math", grade: 95 },
+          { date: "04/30/2025", course: "Science", grade: 91 },
+          { date: "04/30/2025", course: "English", grade: 96 },
+          { date: "04/30/2025", course: "History", grade: 93 },
+          { date: "04/30/2025", course: "Art", grade: 98 },
+          { date: "04/30/2025", course: "Engineering", grade: 94 },
         ];
 
-        setChartData(mockChartData);
+        setGradeUpdates(mockGradeUpdates);
         
-        const dynamicCourses = Object.keys(mockChartData[0]).filter(key => key !== 'date');
-        setCourses(dynamicCourses);
+        const uniqueCourses = Array.from(new Set(mockGradeUpdates.map(update => update.course)));
+        setCourses(uniqueCourses);
 
-        const initialVisibleCourses = dynamicCourses.reduce((acc, course) => {
+        const initialVisibleCourses = uniqueCourses.reduce((acc, course) => {
           acc[course] = true;
           return acc;
-        }, {});
+        }, {} as Record<string, boolean>);
         setVisibleCourses(initialVisibleCourses);
 
         // Mock data for upcoming summatives
@@ -61,7 +117,7 @@ export default function Dashboard() {
     fetchData();
   }, []);
 
-  const handleToggleCourse = (course) => {
+  const handleToggleCourse = (course: string) => {
     setVisibleCourses(prev => ({
       ...prev,
       [course]: !prev[course]
@@ -76,7 +132,7 @@ export default function Dashboard() {
     <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 w-full h-full m-4">
       <div className="lg:col-span-3 h-full">
         <GradetimeChart 
-          chartData={chartData} 
+          gradeUpdates={gradeUpdates}
           courses={courses} 
           visibleCourses={visibleCourses}
           onToggleCourse={handleToggleCourse}
