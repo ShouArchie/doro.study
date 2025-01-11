@@ -58,6 +58,7 @@ def parse_course_outline_to_json(api_key, html_file_path):
         html_content = file.read()
 
     input = f"""Parse the HTML course outline into JSON with the following rules:
+    0. Course code format example: "ECE 105"
     1. Use a single grading scheme if there are no conditional rules.
     2. Symbols should be single characters, unique for each assessment type.
     3. Assessment weight is a float (0.3 for 30%), unless it is a function, which should then be expressed as an equation with the one letter symbols representing the marks in other assessments
@@ -82,7 +83,7 @@ if __name__ == "__main__":
         raise ValueError("API key not found. Make sure GEMINI_API_KEY is set in the .env file.")
 
     # Path to the HTML file you want to parse
-    html_file_path = "outlines\Parse_HTMLs\ECE_page1_4.html"
+    html_file_path = "outlines\\Parse_HTMLs\\simplified_ECE_page.html"
 
     try:
         parsed_json = parse_course_outline_to_json(api_key, html_file_path)
