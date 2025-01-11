@@ -81,8 +81,6 @@ export function GradetimeChart({ chartData, courses, visibleCourses, onToggleCou
     };
   });
 
-  console.log("Processed data:", averageData); // Debug log
-
   const calculateYAxisDomain = () => {
     const allValues = averageData.flatMap(dataPoint => 
       courses.map(course => dataPoint[course]).filter(value => typeof value === 'number')
@@ -95,16 +93,15 @@ export function GradetimeChart({ chartData, courses, visibleCourses, onToggleCou
   };
 
   const yAxisDomain = calculateYAxisDomain();
-  console.log("Y-axis domain:", yAxisDomain); // Debug log
 
   return (
-    <Card className="w-full h-full">
-      <CardHeader>
+    <Card className="w-full h-full flex flex-col">
+      <CardHeader className="flex-shrink-0">
         <CardTitle>Course Performance</CardTitle>
         <CardDescription>Grade Trends Over Time</CardDescription>
       </CardHeader>
-      <CardContent className="h-[calc(100%-8rem)]">
-        <div className="mb-4">
+      <CardContent className="flex-grow flex flex-col min-h-0">
+        <div className="mb-4 flex-shrink-0">
           <h3 className="text-lg font-semibold mb-2">Courses</h3>
           <div className="flex flex-wrap gap-4">
             {courses.map((course) => (
@@ -137,7 +134,7 @@ export function GradetimeChart({ chartData, courses, visibleCourses, onToggleCou
             </div>
           </div>
         </div>
-        <div className="h-[calc(100%-5rem)]">
+        <div className="flex-grow min-h-0">
           <ChartContainer config={chartConfig} className="h-full">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart
@@ -208,7 +205,7 @@ export function GradetimeChart({ chartData, courses, visibleCourses, onToggleCou
           </ChartContainer>
         </div>
       </CardContent>
-      <CardFooter>
+      <CardFooter className="flex-shrink-0">
         <div className="flex w-full items-start gap-2 text-sm">
           <div className="grid gap-2">
             <div className="flex items-center gap-2 font-medium leading-none">

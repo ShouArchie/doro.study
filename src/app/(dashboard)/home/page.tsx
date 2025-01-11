@@ -16,16 +16,16 @@ export default function Dashboard() {
     const fetchData = async () => {
       try {
         const mockChartData = [
-          { date: "Sep 1, 2024", Math: 82, Science: 75, English: 88, History: 80, Art: 90, Engineering: 78 },
-          { date: "10/15/2024", Math: 85, Science: 78, English: 86, History: 82, Art: 92, Engineering: 80 },
-          { date: "November 20", Math: 88, Science: 80, English: 89, History: 85, Art: 91, Engineering: 99 },
-          { date: "2024-12-18", Math: 86, Science: 82, English: 90, History: 83, Art: 93, Engineering: 85 },
-          { date: "Jan 22", Math: 89, Science: 84, English: 88, History: 86, Art: 92, Engineering: 87 },
-          { date: "February 28, 2025", Math: 91, Science: 86, English: 92, History: 88, Art: 94, Engineering: 89 },
-          { date: "Mar 25", Math: 93, Science: 88, English: 91, History: 90, Art: 95, Engineering: 91 },
-          { date: "04/18/2025", Math: 90, Science: 87, English: 93, History: 89, Art: 96, Engineering: 90 },
-          { date: "May 20", Math: 92, Science: 89, English: 94, History: 91, Art: 97, Engineering: 92 },
-          { date: "2025-06-15", Math: 95, Science: 91, English: 96, History: 93, Art: 98, Engineering: 94 }
+          { date: "01/02/2025", Math: 82, Science: 75, English: 88, History: 80, Art: 90, Engineering: 78 },
+          { date: "01/18/2025", Math: 85, Science: 78, English: 86, History: 82, Art: 92, Engineering: 80 },
+          { date: "02/10/2025", Math: 88, Science: 80, English: 89, History: 85, Art: 91, Engineering: 99 },
+          { date: "02/20/2025", Math: 86, Science: 82, English: 90, History: 83, Art: 93, Engineering: 85 },
+          { date: "03/01/2025", Math: 89, Science: 84, English: 88, History: 86, Art: 92, Engineering: 87 },
+          { date: "03/13/2025", Math: 91, Science: 86, English: 92, History: 88, Art: 94, Engineering: 89 },
+          { date: "03/28/2025", Math: 93, Science: 88, English: 91, History: 90, Art: 95, Engineering: 91 },
+          { date: "04/02/2025", Math: 90, Science: 87, English: 93, History: 89, Art: 96, Engineering: 90 },
+          { date: "04/12/2025", Math: 92, Science: 89, English: 94, History: 91, Art: 97, Engineering: 92 },
+          { date: "04/30/2025", Math: 95, Science: 91, English: 96, History: 93, Art: 98, Engineering: 94 }
         ];
 
         setChartData(mockChartData);
