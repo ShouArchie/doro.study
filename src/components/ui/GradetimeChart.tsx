@@ -95,7 +95,7 @@ export function GradetimeChart({ chartData, courses, visibleCourses, onToggleCou
   const yAxisDomain = calculateYAxisDomain();
 
   return (
-    <Card className="w-full h-full flex flex-col">
+    <Card className="w-full h-[600px] md:h-[700px] lg:h-[800px] flex flex-col">
       <CardHeader className="flex-shrink-0">
         <CardTitle>Course Performance</CardTitle>
         <CardDescription>Grade Trends Over Time</CardDescription>
