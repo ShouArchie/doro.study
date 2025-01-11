@@ -130,7 +130,7 @@ export function GradetimeChart({ gradeUpdates, courses, visibleCourses, onToggle
   const yAxisDomain = calculateYAxisDomain();
 
   return (
-    <Card className="flex flex-col">
+    <Card className="flex flex-col h-fit">
       <CardHeader className="flex-shrink-0">
         {isLoading?
         <>
