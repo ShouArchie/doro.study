@@ -126,11 +126,13 @@ export default function DashboardSidebar({ user, loading }: SidebarProps) {
 
     return (
         <Sidebar variant="sidebar" collapsible="icon">
-            <SidebarHeader />
+            <SidebarHeader>
+            <SidebarTrigger className="-ml-1 mx-0.5 my-2 px-2" />
+                </SidebarHeader> 
             <SidebarContent>
                 <SidebarGroup>
                     <SidebarMenu>
-                        <SidebarTrigger className="-ml-1 mx-2 my-4 px-2" />
+                        
                         {items.map((item) => (
                             <SidebarMenuItem key={item.title}>
                                 <SidebarMenuButton asChild>
