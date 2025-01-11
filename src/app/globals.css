@@ -37,7 +37,6 @@
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
-    --color-complete: 12 6.5% 15.1%;
   }
 }
 
@@ -57,17 +56,17 @@
   }
 
   .custom-scrollbar::-webkit-scrollbar {
-    width: 8px;
+    width: 3px;
   }
 
   .custom-scrollbar::-webkit-scrollbar-track {
     background: hsl(var(--muted));
-    border-radius: 4px;
+    border-radius: 3px;
   }
 
   .custom-scrollbar::-webkit-scrollbar-thumb {
-    background-color: hsl(var(--primary));
-    border-radius: 4px;
+    background-color: hsl(var(--muted));
+    border-radius: 1.5px;
   }
 
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {

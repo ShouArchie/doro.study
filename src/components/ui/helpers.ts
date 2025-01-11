@@ -1,22 +1,27 @@
-export const getRandomColor = () => {
-    const letters = '0123456789ABCDEF';
-    let color = '#';
-    for (let i = 0; i < 6; i++) {
-      color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
-  };
-  
-  export const calculateYearProgress = () => {
-    const now = new Date();
-    const startOfYear = new Date(now.getFullYear(), 0, 1);
-    const endOfYear = new Date(now.getFullYear() + 1, 0, 1);
-    const elapsed = now.getTime() - startOfYear.getTime();
-    const total = endOfYear.getTime() - startOfYear.getTime();
-    return Math.floor((elapsed / total) * 100);
-  };
-  
-  type Semester = 'Fall' | 'Winter' | 'Summer';
+export const getChartColors = (): string[] => {
+  return [
+    'hsl(200, 70%, 55%)',  // Muted Blue
+    'hsl(150, 60%, 50%)',  // Muted Green
+    'hsl(350, 70%, 60%)',  // Muted Red
+    'hsl(45, 70%, 60%)',   // Muted Orange
+    'hsl(280, 60%, 65%)',  // Muted Purple
+    'hsl(180, 50%, 55%)',  // Muted Teal
+    'hsl(30, 80%, 60%)',   // Muted Amber
+    'hsl(320, 50%, 60%)'   // Muted Pink
+  ];
+};
+
+
+export const calculateYearProgress = () => {
+  const now = new Date();
+  const startOfYear = new Date(now.getFullYear(), 0, 1);
+  const endOfYear = new Date(now.getFullYear() + 1, 0, 1);
+  const elapsed = now.getTime() - startOfYear.getTime();
+  const total = endOfYear.getTime() - startOfYear.getTime();
+  return Math.floor((elapsed / total) * 100);
+};
+
+type Semester = 'Fall' | 'Winter' | 'Summer';
 
 interface SemesterDates {
   start: Date;
