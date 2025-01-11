@@ -126,12 +126,13 @@ export default function Dashboard() {
 
   return (
     <>
-      {isLoading ? (
+      {isLoading ? 
         <div>Loading</div>
-      ) : (
+      : <>
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 p-4">
           <div className="lg:col-span-3 h-fit w-full">
             <GradetimeChart
+              isLoading={isLoading}
               gradeUpdates={gradeUpdates}
               courses={courses}
               visibleCourses={visibleCourses}
@@ -152,8 +153,9 @@ export default function Dashboard() {
         <div className="">
           <UpcomingSummativesTable summatives={upcomingSummatives} />
         </div>
-      </div>
-    </div>
+        </>
+      }
+    </>
   );
 }
 
