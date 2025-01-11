@@ -126,11 +126,11 @@ export default function Dashboard() {
 
   return (
     <>
-      {isLoading ?
+      {isLoading ? (
         <div>Loading</div>
-        :
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 m-4">
-          <div className="lg:col-span-3">
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 p-4 h-screen">
+          <div className="lg:col-span-3 h-fit w-full">
             <GradetimeChart
               gradeUpdates={gradeUpdates}
               courses={courses}
@@ -138,16 +138,16 @@ export default function Dashboard() {
               onToggleCourse={handleToggleCourse}
             />
           </div>
-          <div className="lg:col-span-1 flex flex-col gap-4">
-            <div className="">
+          <div className="lg:col-span-1 flex flex-col h-[calc(60%-1rem)]">
+            <div className="mb-4 h-[calc(70%-1rem)]">
               <YearProgressChart />
             </div>
-            <div className="">
+            <div className="h-[calc(100%-1rem)]">
               <UpcomingSummativesTable summatives={upcomingSummatives} />
             </div>
           </div>
         </div>
-      }
+      )}
     </>
   );
 }
