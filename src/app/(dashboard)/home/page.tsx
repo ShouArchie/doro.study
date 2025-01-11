@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { GradetimeChart } from "@/components/ui/GradetimeChart";
-import { YearProgressChart } from "@/components/ui/YearProgressChart";
-import { UpcomingSummativesTable } from "@/components/ui/UpcomingSummativesTable";
+import { GradetimeChart } from "@/components/GradetimeChart";
+import { YearProgressChart } from "@/components/YearProgressChart";
+import { UpcomingSummativesTable } from "@/components/UpcomingSummativesTable";
 
 export default function Dashboard() {
   const [chartData, setChartData] = useState([]);
@@ -73,7 +73,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 h-[calc(100vh-4rem)] p-4">
+    <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 w-full h-full m-4">
       <div className="lg:col-span-3 h-full">
         <GradetimeChart 
           chartData={chartData} 
@@ -83,10 +83,10 @@ export default function Dashboard() {
         />
       </div>
       <div className="lg:col-span-1 flex flex-col gap-4 h-full">
-        <div className="flex-grow-0">
-          <YearProgressChart />
+        <div className="h-1/2">
+          <YearProgressChart/>
         </div>
-        <div className="flex-grow overflow-hidden">
+        <div className="h-1/2">
           <UpcomingSummativesTable summatives={upcomingSummatives} />
         </div>
       </div>

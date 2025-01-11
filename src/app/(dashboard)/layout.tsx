@@ -84,7 +84,7 @@ export default function DashboardLayout({ children }: DashboardProps) {
     return <div className="flex flex-row">
         <SidebarProvider open={false}>
             <DashboardSidebar user={user} loading={loading} />
-            <SidebarTrigger className="-ml-1 mx-2 my-4 px-2" />
+            {/* <SidebarTrigger className="-ml-1 mx-2 my-4 px-2" /> */}
             <SidebarInset>
                 {children}
             </SidebarInset>

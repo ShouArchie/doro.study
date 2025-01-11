@@ -41,7 +41,7 @@ export function YearProgressChart() {
   } satisfies ChartConfig;
 
   return (
-    <Card className="w-full h-[400px] flex flex-col">
+    <Card className="w-full h-full flex flex-col">
       <CardHeader className="text-center">
         <CardTitle>Semester Progress</CardTitle>
         <CardDescription>{semester} Semester {dates.start.getFullYear()}</CardDescription>
@@ -51,7 +51,7 @@ export function YearProgressChart() {
           config={dynamicChartConfig}
           className="w-full h-full"
         >
-          <ResponsiveContainer width="100%" height="100%" >
+          <ResponsiveContainer width="100%" height="100%">
             <RadialBarChart
               data={dynamicChartData}
               startAngle={90}

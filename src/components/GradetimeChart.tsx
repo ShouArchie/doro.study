@@ -103,7 +103,7 @@ export function GradetimeChart({ chartData, courses, visibleCourses, onToggleCou
         <CardTitle>Course Performance</CardTitle>
         <CardDescription>Grade Trends Over Time</CardDescription>
       </CardHeader>
-      <CardContent className="h-[calc(100%-8rem)]">
+      <CardContent className="">
         <div className="mb-4">
           <h3 className="text-lg font-semibold mb-2">Courses</h3>
           <div className="flex flex-wrap gap-4">

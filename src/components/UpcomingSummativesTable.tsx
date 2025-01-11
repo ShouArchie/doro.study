@@ -13,16 +13,18 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { ScrollArea } from "./ui/scroll-area";
 
 export function UpcomingSummativesTable({ summatives }) {
   return (
-    <Card className="w-full">
-      <CardHeader>
-        <CardTitle>Upcoming Summatives</CardTitle>
-        <CardDescription>Your next assessments</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="max-h-[270px] overflow-auto pr-2 custom-scrollbar">
+      <Card className="w-full h-full">
+        <CardHeader>
+          <CardTitle>Upcoming Summatives</CardTitle>
+          <CardDescription>Your next assessments</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {/* <div className="max-h-[270px] overflow-auto pr-2 custom-scrollbar"> */}
+          <ScrollArea className="h-[50px]">
           <Table>
             <TableHeader>
               <TableRow>
@@ -42,8 +44,8 @@ export function UpcomingSummativesTable({ summatives }) {
                 </TableRow>
               ))}
             </TableBody>
-          </Table>
-        </div>
+        </Table>
+      </ScrollArea>
       </CardContent>
     </Card>
   );
