@@ -3,18 +3,18 @@ import { NextResponse } from "next/server";
 
 export async function GET(){
     try {
-        const classesQuery = (await getClient())
-            .from('schedules')
-            .select('course_code');
+        const courseQuery = (await getClient()).rpc('get_distinct_column')
 
-        const { data, error } = await classesQuery;
+        const { data, error } = await courseQuery
+
+        console.log(data);
 
         if (error) {
             console.error("Error fetching classes", error.message);
             return NextResponse.json({ error: error.message }, { status: 400 });
         }
 
-        if (!data) {
+        if (!data || !data[0]) {
             console.error("No classes found");
             return NextResponse.json({ error: "No classes found" }, { status: 404 });
         }

@@ -49,4 +49,3 @@ export function UpcomingSummativesTable({ summatives }) {
     </Card>
   );
 }
-

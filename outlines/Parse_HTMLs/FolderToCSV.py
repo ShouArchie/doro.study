@@ -116,24 +116,6 @@ def parse_course_outline_to_json(api_key, html_file_path):
     raise Exception("Max retries exceeded. Could not complete the API call.")
 
 
-def generate_csv_all(input_folder, output_csv, api_key):
-    rows = []
-    for folder_name in os.listdir(input_folder):
-        folder_path = os.path.join(input_folder, folder_name)
-        print(folder_path)
-        for file_name in os.listdir(folder_path):
-            if file_name.endswith('.html'):
-                file_path = os.path.join(folder_path, file_name)
-                course_json = parse_course_outline_to_json(api_key, file_path)
-                rows.append([json.dumps(course_json)])  # Dump the dictionary as a JSON string for the CSV
-    # Write to CSV
-    with open(output_csv, 'w', newline='', encoding='utf-8') as csvfile:
-        csvwriter = csv.writer(csvfile)
-        csvwriter.writerow([
-            "JSON"
-        ])
-        csvwriter.writerows(rows)
-
 def generate_csv_subject(input_folder, output_csv, api_key):
     with open(output_csv, 'w', newline='', encoding='utf-8') as csvfile:
         csvwriter = csv.writer(csvfile)
@@ -145,46 +127,13 @@ def generate_csv_subject(input_folder, output_csv, api_key):
                 course_json = parse_course_outline_to_json(api_key, file_path)
                 csvwriter.writerow([json.dumps(course_json)])  # Write each parsed JSON to the CSV
 
-def generate_json_subject(input_folder, output_json, api_key):
-    all_data = []  # List to store all parsed JSON objects
-
-    for file_name in os.listdir(input_folder):
-        if file_name.endswith('.html'):
-            file_path = os.path.join(input_folder, file_name)
-            print("Processing: " + file_path)
-            # Assuming `parse_course_outline_to_json` is a function that parses the HTML and returns JSON
-            course_json = parse_course_outline_to_json(api_key, file_path)
-            all_data.append(course_json)  # Add each parsed JSON to the list
-
-    # Write the list of JSON objects to the output file
-    with open(output_json, 'w', encoding='utf-8') as jsonfile:
-        json.dump(all_data, jsonfile, ensure_ascii=False, indent=4)
-
-def generate_json_all(input_folder, output_json, api_key):
-    all_data = []  # List to store all parsed JSON objects
-
-    for folder_name in os.listdir(input_folder):
-        folder_path = os.path.join(input_folder, folder_name)
-        print(folder_path)
-        for file_name in os.listdir(folder_path):
-            if file_name.endswith('.html'):
-                file_path = os.path.join(folder_path, file_name)
-                print("Processing: " + file_path)
-                # Assuming `parse_course_outline_to_json` is a function that parses the HTML and returns JSON
-                course_json = parse_course_outline_to_json(api_key, file_path)
-                all_data.append(course_json)  # Add each parsed JSON to the list
-
-    # Write the list of JSON objects to the output file
-    with open(output_json, 'w', encoding='utf-8') as jsonfile:
-        json.dump(all_data, jsonfile, ensure_ascii=False, indent=4)
-
 
 def generate_json_procedural(input_folder, output_folder, api_key):
     for folder_name in os.listdir(input_folder):
         folder_path = os.path.join(input_folder, folder_name)
-        output_json = os.path.join(output_folder, f"{folder_name}.json")
+        output_json = os.path.join(output_folder, f"{folder_name}.csv")
         print(folder_path)
-        generate_json_subject(folder_path, output_json, api_key)
+        generate_csv_subject(folder_path, output_json, api_key)
 
 
 if __name__ == "__main__":
@@ -196,9 +145,7 @@ if __name__ == "__main__":
 
     # Path to the HTML file you want to parse
     html_main_folder_path = "outlines\\SimplifiedHTMLFiles"
-    html_folder_path = "outlines\\SimplifiedHTMLFiles\\ANTH"
-    output_csv_path = "outlines\\courseOutlinesParsed.json"  # Replace with your desired output file name
-    output_csv_folder = "outlines\\JSONs"
+    output_csv_folder = "outlines\\CSVs"
 
     try:
         generate_json_procedural(html_main_folder_path, output_csv_folder, api_key)
