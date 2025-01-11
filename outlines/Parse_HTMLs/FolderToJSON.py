@@ -64,7 +64,7 @@ def parse_course_outline_to_json(api_key, html_file_path):
     1. Use a single grading scheme if there are no conditional rules.
     2. Symbols should be single characters, unique for each assessment type.
     3. Assessment weight is a float (0.3 for 30%), unless it is a function, which should then be expressed as an equation with the one letter symbols representing the marks in other assessments
-    4. Leave grade as -1.0
+    4. Leave grade as NULL
     The html is attached: \n
     {html_content}
     """
@@ -166,6 +166,14 @@ def generate_json_all(input_folder, output_json, api_key):
         json.dump(all_data, jsonfile, ensure_ascii=False, indent=4)
 
 
+def generate_json_procedural(input_folder, output_folder, api_key):
+    for folder_name in os.listdir(input_folder):
+        folder_path = os.path.join(input_folder, folder_name)
+        output_json = os.path.join(output_folder, f"{folder_name}.json")
+        print(folder_path)
+        generate_json_subject(folder_path, output_json, api_key)
+
+
 if __name__ == "__main__":
     # Replace with your actual API key
     api_key = os.getenv('GEMINI_API_KEY')
@@ -174,11 +182,13 @@ if __name__ == "__main__":
         raise ValueError("API key not found. Make sure GEMINI_API_KEY is set in the .env file.")
 
     # Path to the HTML file you want to parse
+    html_main_folder_path = "outlines\\SimplifiedHTMLFiles"
     html_folder_path = "outlines\\SimplifiedHTMLFiles\\ANTH"
-    output_csv_path = "outlines\\ANTH.json"  # Replace with your desired output file name
+    output_csv_path = "outlines\\courseOutlinesParsed.json"  # Replace with your desired output file name
+    output_csv_folder = "outlines\\JSONs"
 
     try:
-        generate_json_subject(html_folder_path, output_csv_path, api_key)
+        generate_json_procedural(html_main_folder_path, output_csv_folder, api_key)
         # print("Parsed JSON from the course outline:")
     except Exception as e:
         print(f"An error occurred: {e}")
