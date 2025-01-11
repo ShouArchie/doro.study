@@ -145,12 +145,6 @@ def generate_json_subject(input_folder, output_json, api_key):
     with open(output_json, 'w', encoding='utf-8') as jsonfile:
         json.dump(all_data, jsonfile, ensure_ascii=False, indent=4)
 
-# Example usage
-input_folder = '/path/to/input_folder'  # Replace with your input folder path
-output_json = '/path/to/output.json'  # Replace with your desired output JSON file path
-api_key = 'your_api_key_here'  # Replace with your API key
-generate_json_subject(input_folder, output_json, api_key)
-
 
 if __name__ == "__main__":
     # Replace with your actual API key
@@ -164,7 +158,7 @@ if __name__ == "__main__":
     output_csv_path = "outlines\\ECE_JSON3.csv"  # Replace with your desired output file name
 
     try:
-        generate_csv_subject(html_folder_path, output_csv_path, api_key)
+        generate_json_subject(html_folder_path, output_csv_path, api_key)
         # print("Parsed JSON from the course outline:")
     except Exception as e:
         print(f"An error occurred: {e}")
