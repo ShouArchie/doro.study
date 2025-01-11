@@ -7,8 +7,6 @@ export async function GET(){
 
         const { data, error } = await courseQuery
 
-        console.log(data);
-
         if (error) {
             console.error("Error fetching classes", error.message);
             return NextResponse.json({ error: error.message }, { status: 400 });
