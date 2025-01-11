@@ -1,3 +1,4 @@
+import React from 'react';
 import { TrendingUp } from 'lucide-react';
 import {
   CartesianGrid,
@@ -19,19 +20,42 @@ import {
   ChartConfig,
   ChartContainer,
   ChartTooltip,
-  ChartTooltipContent,
 } from "@/components/ui/chart";
 import { Checkbox } from "@/components/ui/checkbox";
 import { getChartColors } from "@/components/ui/helpers";
+import { parse, format, isValid, compareAsc } from 'date-fns';
+
+const parseDate = (dateString: string | undefined) => {
+  if (!dateString) return new Date(NaN);
+  
+  const formats = ['yyyy-MM-dd', 'MM/dd/yyyy', 'dd/MM/yyyy', 'MMM d', 'MMMM d', 'MMM d yyyy', 'MMMM d yyyy'];
+  for (const fmt of formats) {
+    const date = parse(dateString, fmt, new Date());
+    if (isValid(date)) {
+      return date;
+    }
+  }
+  return new Date(NaN);
+};
+
+const formatDate = (date: Date) => {
+  return isValid(date) ? format(date, 'MMM d, yyyy') : 'Invalid Date';
+};
+
+interface GradeUpdate {
+  date: string;
+  course: string;
+  grade: number;
+}
 
 interface GradetimeChartProps {
-  chartData: any[];
+  gradeUpdates: GradeUpdate[];
   courses: string[];
   visibleCourses: Record<string, boolean>;
   onToggleCourse: (course: string) => void;
 }
 
-export function GradetimeChart({ chartData, courses, visibleCourses, onToggleCourse }: GradetimeChartProps) {
+export function GradetimeChart({ gradeUpdates, courses, visibleCourses, onToggleCourse }: GradetimeChartProps) {
   const colors = getChartColors();
   const chartConfig = courses.reduce((acc, course, index) => {
     acc[course] = {
@@ -46,13 +70,44 @@ export function GradetimeChart({ chartData, courses, visibleCourses, onToggleCou
     color: "hsl(var(--primary))",
   };
 
+  const sortedUpdates = [...gradeUpdates]
+    .filter(update => isValid(parseDate(update.date)))
+    .sort((a, b) => compareAsc(parseDate(a.date), parseDate(b.date)));
+
+  const chartData = sortedUpdates.reduce((acc, update) => {
+    const date = parseDate(update.date);
+    const existingDataPoint = acc.find(dp => dp.date.getTime() === date.getTime());
+
+    if (existingDataPoint) {
+      existingDataPoint[update.course] = update.grade;
+    } else {
+      const newDataPoint: any = { date, parsedDate: date };
+      newDataPoint[update.course] = update.grade;
+      acc.push(newDataPoint);
+    }
+
+    return acc;
+  }, [] as any[]);
+
   const averageData = chartData.map((dataPoint) => {
     const visibleCourseValues = courses
       .filter((course) => visibleCourses[course])
-      .map((course) => dataPoint[course] || 0);
+      .map((course) => {
+        if (dataPoint[course] !== undefined) {
+          return dataPoint[course];
+        }
+        // Find the most recent grade for this course
+        const recentUpdate = sortedUpdates
+          .filter(update => update.course === course && parseDate(update.date) <= dataPoint.date)
+          .pop();
+        return recentUpdate ? recentUpdate.grade : null;
+      })
+      .filter((value): value is number => value !== null);
+
     const average = visibleCourseValues.length
       ? visibleCourseValues.reduce((sum, value) => sum + value, 0) / visibleCourseValues.length
       : 0;
+
     return {
       ...dataPoint,
       average: Number(average.toFixed(2)),
@@ -61,27 +116,29 @@ export function GradetimeChart({ chartData, courses, visibleCourses, onToggleCou
 
   const calculateYAxisDomain = () => {
     const allValues = averageData.flatMap(dataPoint => 
-      Object.values(dataPoint).filter(value => typeof value === 'number')
+      courses.map(course => dataPoint[course]).filter(value => typeof value === 'number')
     );
     const minValue = Math.min(...allValues);
     const maxValue = Math.max(...allValues);
     const lowerBound = Math.max(0, Math.floor((minValue - 5) / 10) * 10);
-    const upperBound = Math.ceil(maxValue / 10) * 10;
+    const upperBound = Math.min(100, Math.ceil((maxValue + 5) / 10) * 10);
     return [lowerBound, upperBound];
   };
 
+  const yAxisDomain = calculateYAxisDomain();
+
   return (
-    <Card className="w-full h-[600px] md:h-[700px] lg:h-[800px]">
-      <CardHeader>
+    <Card className="w-full h-full flex flex-col">
+      <CardHeader className="flex-shrink-0">
         <CardTitle>Course Performance</CardTitle>
         <CardDescription>Grade Trends Over Time</CardDescription>
       </CardHeader>
-      <CardContent className="h-[calc(100%-8rem)]">
-        <div className="mb-4">
+      <CardContent className="flex-grow flex flex-col min-h-0 p-4">
+        <div className="mb-2 flex-shrink-0">
           <h3 className="text-lg font-semibold mb-2">Courses</h3>
-          <div className="flex flex-wrap gap-4">
+          <div className="flex flex-wrap gap-2">
             {courses.map((course) => (
-              <div key={course} className="flex items-center space-x-2">
+              <div key={course} className="flex items-center space-x-1">
                 <Checkbox
                   id={course}
                   checked={visibleCourses[course]}
@@ -89,13 +146,13 @@ export function GradetimeChart({ chartData, courses, visibleCourses, onToggleCou
                 />
                 <label
                   htmlFor={course}
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  className="text-xs font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                 >
                   {course}
                 </label>
               </div>
             ))}
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-1">
               <Checkbox
                 id="average"
                 checked={visibleCourses.average}
@@ -103,37 +160,58 @@ export function GradetimeChart({ chartData, courses, visibleCourses, onToggleCou
               />
               <label
                 htmlFor="average"
-                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                className="text-xs font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
               >
                 Average
               </label>
             </div>
           </div>
         </div>
-        <div className="h-[calc(100%-4rem)]">
+        <div className="flex-grow min-h-0">
           <ChartContainer config={chartConfig} className="h-full">
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="95%" height="100%">
               <LineChart
                 data={averageData}
-                margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+                margin={{ top: 20, right: 30, left: 10, bottom: 20 }}
               >
                 <CartesianGrid strokeDasharray="3 3" opacity={0.1} />
                 <XAxis
-                  dataKey="month"
+                  dataKey="parsedDate"
                   tickLine={false}
                   axisLine={false}
                   tickMargin={8}
-                  tickFormatter={(value) => value.slice(0, 3)}
+                  tickFormatter={(value) => isValid(value) ? format(value, 'MMM d') : ''}
                   stroke="hsl(var(--muted-foreground))"
+                  interval="preserveStartEnd"
+                  minTickGap={30}
+                  fontSize={10}
                 />
                 <YAxis
-                  domain={calculateYAxisDomain()}
+                  domain={yAxisDomain}
                   tickCount={6}
                   tickFormatter={(value) => `${value}%`}
                   stroke="hsl(var(--muted-foreground))"
-                  label={{ value: "Grade (%)", angle: -90, position: 'insideLeft', style: { textAnchor: 'middle' } }}
+                  fontSize={10}
+                  width={30}
                 />
-                <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
+                <ChartTooltip
+                  cursor={false}
+                  content={({ active, payload, label }) => {
+                    if (active && payload && payload.length) {
+                      return (
+                        <div className="bg-background border border-border p-1 rounded shadow text-xs">
+                          <p className="font-bold">{formatDate(label)}</p>
+                          {payload.map((entry, index) => (
+                            <p key={index} style={{ color: entry.color }}>
+                              {entry.name}: {entry.value}%
+                            </p>
+                          ))}
+                        </div>
+                      );
+                    }
+                    return null;
+                  }}
+                />
                 {courses.map((course) => (
                   visibleCourses[course] && (
                     <Line
@@ -141,10 +219,11 @@ export function GradetimeChart({ chartData, courses, visibleCourses, onToggleCou
                       dataKey={course}
                       type="monotone"
                       stroke={chartConfig[course].color}
-                      strokeWidth={2}
-                      strokeDasharray="5 5"
-                      dot={{ r: 4, strokeWidth: 2 }}
-                      activeDot={{ r: 6, strokeWidth: 2 }}
+                      strokeWidth={1}
+                      connectNulls
+                      dot={{ r: 2, strokeWidth: 1 }}
+                      activeDot={{ r: 4, strokeWidth: 1 }}
+                      strokeDasharray="3 3"
                     />
                   )
                 ))}
@@ -154,9 +233,9 @@ export function GradetimeChart({ chartData, courses, visibleCourses, onToggleCou
                     dataKey="average"
                     type="monotone"
                     stroke={chartConfig.average.color}
-                    strokeWidth={3}
-                    dot={{ r: 4, strokeWidth: 2, fill: chartConfig.average.color }}
-                    activeDot={{ r: 6, strokeWidth: 2 }}
+                    strokeWidth={2}
+                    dot={{ r: 2, strokeWidth: 1, fill: chartConfig.average.color }}
+                    activeDot={{ r: 4, strokeWidth: 1 }}
                   />
                 )}
               </LineChart>
@@ -164,11 +243,11 @@ export function GradetimeChart({ chartData, courses, visibleCourses, onToggleCou
           </ChartContainer>
         </div>
       </CardContent>
-      <CardFooter>
-        <div className="flex w-full items-start gap-2 text-sm">
-          <div className="grid gap-2">
-            <div className="flex items-center gap-2 font-medium leading-none">
-              Grade Trends <TrendingUp className="h-4 w-4" />
+      <CardFooter className="flex-shrink-0">
+        <div className="flex w-full items-start gap-2 text-xs">
+          <div className="grid gap-1">
+            <div className="flex items-center gap-1 font-medium leading-none">
+              Grade Trends <TrendingUp className="h-3 w-3" />
             </div>
           </div>
         </div>
