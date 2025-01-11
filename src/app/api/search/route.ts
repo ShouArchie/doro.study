@@ -3,12 +3,11 @@ import { NextResponse } from "next/server";
 
 export async function GET(){
     try {
-        const classesQuery = (await getClient())
-            .from('schedules')
-            .select('course_code');
+        const courseQuery = (await getClient()).rpc('get_distinct_column')
 
-        console.log(classesQuery)
-        const { data, error } = await classesQuery;
+        const { data, error } = await courseQuery
+
+        console.log(data);
 
         if (error) {
             console.error("Error fetching classes", error.message);
