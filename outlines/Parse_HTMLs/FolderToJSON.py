@@ -39,6 +39,7 @@ class Assessment(typing.TypedDict):
     drop: int
     symbol: str # one letter please
     weight: str
+    grade: float
 
 class Scheme(typing.TypedDict):
     schemeNum: int
@@ -63,6 +64,7 @@ def parse_course_outline_to_json(api_key, html_file_path):
     1. Use a single grading scheme if there are no conditional rules.
     2. Symbols should be single characters, unique for each assessment type.
     3. Assessment weight is a float (0.3 for 30%), unless it is a function, which should then be expressed as an equation with the one letter symbols representing the marks in other assessments
+    4. Leave grade as -1.0
     The html is attached: \n
     {html_content}
     """
@@ -145,6 +147,24 @@ def generate_json_subject(input_folder, output_json, api_key):
     with open(output_json, 'w', encoding='utf-8') as jsonfile:
         json.dump(all_data, jsonfile, ensure_ascii=False, indent=4)
 
+def generate_json_all(input_folder, output_json, api_key):
+    all_data = []  # List to store all parsed JSON objects
+
+    for folder_name in os.listdir(input_folder):
+        folder_path = os.path.join(input_folder, folder_name)
+        print(folder_path)
+        for file_name in os.listdir(folder_path):
+            if file_name.endswith('.html'):
+                file_path = os.path.join(folder_path, file_name)
+                print("Processing: " + file_path)
+                # Assuming `parse_course_outline_to_json` is a function that parses the HTML and returns JSON
+                course_json = parse_course_outline_to_json(api_key, file_path)
+                all_data.append(course_json)  # Add each parsed JSON to the list
+
+    # Write the list of JSON objects to the output file
+    with open(output_json, 'w', encoding='utf-8') as jsonfile:
+        json.dump(all_data, jsonfile, ensure_ascii=False, indent=4)
+
 
 if __name__ == "__main__":
     # Replace with your actual API key
@@ -154,8 +174,8 @@ if __name__ == "__main__":
         raise ValueError("API key not found. Make sure GEMINI_API_KEY is set in the .env file.")
 
     # Path to the HTML file you want to parse
-    html_folder_path = "outlines\\SimplifiedHTMLFiles\\ECE"
-    output_csv_path = "outlines\\ECE_JSON3.csv"  # Replace with your desired output file name
+    html_folder_path = "outlines\\SimplifiedHTMLFiles\\ANTH"
+    output_csv_path = "outlines\\ANTH.json"  # Replace with your desired output file name
 
     try:
         generate_json_subject(html_folder_path, output_csv_path, api_key)
