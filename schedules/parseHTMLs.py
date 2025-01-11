@@ -80,8 +80,11 @@ def parse_html(file_path):
             # tdlen = len(time_days_split)
             # print(f"len: {tdlen}")
             # continue
-            days_range = len(time_days_date) - 11
-            time_range, days = time_days_date[:11], time_days_date[11:days_range]
+            days_range = 0
+            for char in time_days_date:
+                if (char.isalpha()):
+                    days_range += 1
+            time_range, days = time_days_date[:11], time_days_date[11:days_range+11]
             # print("ECE" + course_code + " " + class_number + " " + class_type + section)
             # print(f"tdd: {time_days_date}")
             # print(f"tr: {time_range}")

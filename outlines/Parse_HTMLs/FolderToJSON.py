@@ -116,8 +116,8 @@ if __name__ == "__main__":
         raise ValueError("API key not found. Make sure GEMINI_API_KEY is set in the .env file.")
 
     # Path to the HTML file you want to parse
-    html_folder_path = "outlines\HTML_Files\ECE"
-    output_csv_path = "outlines\ECE_JSON2.csv"  # Replace with your desired output file name
+    html_folder_path = "outlines\\HTML_Files\\ECE"
+    output_csv_path = "outlines\\ECE_JSON2.csv"  # Replace with your desired output file name
 
     try:
         generate_csv_subject(html_folder_path, output_csv_path, api_key)
