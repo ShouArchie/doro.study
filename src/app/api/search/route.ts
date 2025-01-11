@@ -7,6 +7,7 @@ export async function GET(){
             .from('schedules')
             .select('course_code');
 
+        console.log(classesQuery)
         const { data, error } = await classesQuery;
 
         if (error) {
@@ -14,7 +15,7 @@ export async function GET(){
             return NextResponse.json({ error: error.message }, { status: 400 });
         }
 
-        if (!data) {
+        if (!data || !data[0]) {
             console.error("No classes found");
             return NextResponse.json({ error: "No classes found" }, { status: 404 });
         }
