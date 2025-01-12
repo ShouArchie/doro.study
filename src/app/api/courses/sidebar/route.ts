@@ -56,6 +56,18 @@ export async function POST(Req:NextRequest){
         
         const { value: { code, id } } = await Req.json()
 
+        interface Course {
+            id: string,
+            code: string,
+        }
+
+        interface SelectedCourse {
+            courses: Course[];
+        }
+
+        interface Data {
+            selected_courses: (SelectedCourse | {})[];
+        }
         // Validate input
         if (!code) {
             return NextResponse.json(
@@ -117,14 +129,21 @@ export async function POST(Req:NextRequest){
             return NextResponse.json({error: "Invalid term value"}, {status: 501})
         }
 
-        data.selected_courses![index]! = {courses: { ...data.selected_courses![index]!, code:code, id:id}}
+        // data.selected_courses![index]! = {courses: { ...data.selected_courses![index], code:code, id:id}}
+        const selectedCourses = data.selected_courses![index] as unknown as SelectedCourse;
 
-        console.log("MOST IMPORTANTEST TEST: ", data.selected_courses!)
+        if (!selectedCourses.courses){
+            selectedCourses.courses = []
+        }
+
+        selectedCourses.courses.push({id, code});
+
+        console.log("MOST IMPORTANTEST TEST: ", data!.selected_courses)
 
         //TODO: Add once confirmed that the data is correctly formatted
         const res = await (await getClient())
             .from('profiles')
-            .insert({'selected_courses': data.selected_courses!})
+            .update({'selected_courses': data!.selected_courses})
             .eq('id', formatted_metadata.id);
 
 
