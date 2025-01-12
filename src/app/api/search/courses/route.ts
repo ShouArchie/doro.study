@@ -4,10 +4,10 @@ import { NextResponse } from "next/server";
 export async function GET(){
     try {
         const courseQuery = (await getClient()).rpc('get_distinct_column')
-        const personnelQuery = (await getClient()).from('outlines').select('personnel') //REPLACE THIS WITH COURSE NAME ONCE ALLEN FINISHES HIS STUFF 
+        const nameQuery = (await getClient()).from('outlines').select('course_name') 
 
         const { data, error } = await courseQuery
-        const { data: personnelData, error: personnelError } = await personnelQuery
+        const { data: nameData, error: nameError } = await nameQuery
 
         //Error handling for courseQuery
         if (error) {
@@ -20,18 +20,18 @@ export async function GET(){
             return NextResponse.json({ error: "No classes found" }, { status: 404 });
         }
 
-        //Error handling for personnelQuery
-        if (personnelError) {
-            console.error("Error fetching personnel", personnelError.message);
-            return NextResponse.json({ error: personnelError.message }, { status: 400 });
+        //Error handling for nameQuery
+        if (nameError) {
+            console.error("Error fetching name", nameError.message);
+            return NextResponse.json({ error: nameError.message }, { status: 400 });
         }
 
-        if (!personnelData || !personnelData[0]) {
-            console.error("No personnel found");
-            return NextResponse.json({ error: "No personnel found" }, { status: 404 });
+        if (!nameData || !nameData[0]) {
+            console.error("No name found");
+            return NextResponse.json({ error: "No name found" }, { status: 404 });
         }
 
-        return NextResponse.json({ data, personnelData }, { status: 200 });
+        return NextResponse.json({ data, nameData }, { status: 200 });
     }
     catch (error) {
         console.error("Internal Server Error");

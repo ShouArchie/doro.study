@@ -12,18 +12,21 @@ export type Database = {
       outlines: {
         Row: {
           course_code: string
+          course_name: string | null
           id: string
           personnel: Json | null
           schemes: Json | null
         }
         Insert: {
           course_code: string
+          course_name?: string | null
           id?: string
           personnel?: Json | null
           schemes?: Json | null
         }
         Update: {
           course_code?: string
+          course_name?: string | null
           id?: string
           personnel?: Json | null
           schemes?: Json | null
