@@ -68,7 +68,9 @@ export default function SearchPage() {
             }
 
             // Always include pinned items at the top in the order they were pinned
-            const pinnedResults = pinnedItems.map(id => courses.find(course => course.id === id)).filter(Boolean);
+            const pinnedResults = pinnedItems
+                .map(id => courses.find(course => course.id === id))
+                .filter((course): course is { id: string, code: string, name: string, description: string } => course !== undefined);
             const unpinnedResults = filteredResults.filter(item => !pinnedItems.includes(item.id));
 
             setResults([...pinnedResults, ...unpinnedResults]);
@@ -294,40 +296,57 @@ export default function SearchPage() {
                         <Accordion type="single" collapsible className="w-full">
                             {results.map((result) => (
                                 <AccordionItem key={result.id} value={result.id} className="border rounded-md mb-3 overflow-hidden">
-                                    <div data-course={result.id} className="flex items-center space-x-4 p-4">
-                                        <div className="flex-1 space-y-1">
-                                            <p className="text-sm font-medium leading-none">
-                                                {result.code}
-                                            </p>
-                                            <p className="text-sm text-muted-foreground">
-                                                {result.name}
-                                            </p>
+                                    <div 
+                                        onClick={() => {
+                                            const accordionTrigger = document.querySelector(`[data-state][value="${result.id}"]`);
+                                            if (accordionTrigger) {
+                                                const currentState = accordionTrigger.getAttribute('data-state');
+                                                accordionTrigger.setAttribute('data-state', currentState === 'open' ? 'closed' : 'open');
+                                            }
+                                        }}
+                                    >
+                                        <div data-course={result.id} className="flex items-center space-x-4 p-4">
+                                            <div className="flex-1 space-y-1">
+                                                <p className="text-sm font-medium leading-none">
+                                                    {result.code}
+                                                </p>
+                                                <p className="text-sm text-muted-foreground">
+                                                    {result.name}
+                                                </p>
+                                            </div>
+                                            <div className="flex items-center space-x-2">
+                                                <AccordionTrigger 
+                                                    className="p-0 h-8 w-8" 
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        e.preventDefault();
+                                                    }}
+                                                    onFocus={(e) => e.target.blur()}
+                                                >
+                                                </AccordionTrigger>
+                                                <Button variant="ghost" className="p-0 h-8 w-8">
+                                                    <Plus className="h-4 w-4" />
+                                                </Button>
+                                                <Button
+                                                    className="p-0 h-8 w-8"
+                                                    variant="ghost"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        togglePin(result);
+                                                    }}
+                                                >
+                                                    <span className="pin-icon transition-transform duration-300">
+                                                        {pinnedItems.includes(result.id) ? <PinOff className="h-4 w-4" /> : <Pin className="h-4 w-4" />}
+                                                    </span>
+                                                </Button>
+                                            </div>
                                         </div>
-                                        <div className="flex items-center space-x-2">
-                                            <AccordionTrigger className="p-0 h-8 w-8" onClick={(e) => e.stopPropagation()}>
-                                            </AccordionTrigger>
-                                            <Button variant="ghost" className="p-0 h-8 w-8">
-                                                <Plus className="h-4 w-4" />
-                                            </Button>
-                                            <Button
-                                              className="p-0 h-8 w-8"
-                                              variant="ghost"
-                                              onClick={(e) => {
-                                                e.stopPropagation();
-                                                togglePin(result);
-                                              }}
-                                            >
-                                              <span className="pin-icon transition-transform duration-300">
-                                                {pinnedItems.includes(result.id) ? <PinOff className="h-4 w-4" /> : <Pin className="h-4 w-4" />}
-                                              </span>
-                                            </Button>
-                                        </div>
+                                        <AccordionContent>
+                                            <div className="px-4 pb-0">
+                                                <p className="text-sm text-muted-foreground">{result.description}</p>
+                                            </div>
+                                        </AccordionContent>
                                     </div>
-                                    <AccordionContent>
-                                        <div className="px-4 pb-0">
-                                            <p className="text-sm text-muted-foreground">{result.description}</p>
-                                        </div>
-                                    </AccordionContent>
                                 </AccordionItem>
                             ))}
                         </Accordion>
