@@ -55,23 +55,11 @@ export async function POST(Req:NextRequest){
         const cookieStore = await cookies()
         
         const { value: { code, id } } = await Req.json()
-
-        interface Course {
-            id: string,
-            code: string,
-        }
-
-        interface SelectedCourse {
-            courses: Course[];
-        }
-
-        interface Data {
-            selected_courses: (SelectedCourse | {})[];
-        }
+        
         // Validate input
-        if (!code) {
+        if (!code || !id) {
             return NextResponse.json(
-                { error: "Invalid Request (Course Code is required)" },
+                { error: "Invalid Request (Course Code / ID is required)" },
                 { status: 400 }
             )
         }
@@ -80,7 +68,7 @@ export async function POST(Req:NextRequest){
         console.log("ID: ", id)
 
         if (!cookieStore.has('user_metadata') || !cookieStore.has('term')){
-            console.error("User doens't have metadata / Term data is not stored")
+            console.error("User doesn't have metadata / Term data is not stored")
             return NextResponse.json({error: "User doesn't have metadata / Term data is not stored"}, {status: 404})
         }
 
@@ -88,67 +76,76 @@ export async function POST(Req:NextRequest){
         const term = cookieStore.get('term')
 
         const formatted_metadata = JSON.parse(metadata!.value)
+        const value = term!.value
 
-        const { data, error }= await (await getClient())
+        let { data, error } : {data: any, error: any} = await (await getClient())
             .from('profiles')
-            .select('selected_courses')
+            .select(`${value}`)
             .eq('id', formatted_metadata.id)
             .single()
 
-        if (error){
-            console.error("Error returning selected_courses: ", error.message)
-            return NextResponse.json({error: error.message}, {status: 400})
-        }
+        let courseArray = []; //empty array
 
-        if (!data){
-            console.error("Old selected courses data returned nothing")
-            return NextResponse.json({error:"Old selected courses data returned nothing"}, {status: 404})
-        }
-
-        //Data is valid now, save new one in cookies for caching
-        const value = term!.value;
-
-        let index; //TODO: Write a better for loop
-        if (value==="1A"){
-            index = 0;
-        } else if(value==="1B"){
-            index = 1;
-        } else if (value==="2A"){
-            index = 2;
-        } else if (value==="2B"){
-            index = 3;
-        } else if (value==="3A"){
-            index = 4;
-        } else if (value==="3B"){
-            index = 5;
-        } else if (value==="4A"){
-            index = 6;
-        } else if (value==="4B"){
-            index = 7;
+        if (data && Array.isArray(data[`${value}`])) {
+            courseArray = data[`${value}`]
         } else {
-            return NextResponse.json({error: "Invalid term value"}, {status: 501})
+            console.warn("Data is not formmated as an array. Initializing a new array");
+            courseArray = []
         }
 
-        // data.selected_courses![index]! = {courses: { ...data.selected_courses![index], code:code, id:id}}
-        const selectedCourses = data.selected_courses![index] as unknown as SelectedCourse;
+        courseArray.push({ id, code });
+        console.log("Updated course array: ", courseArray);
 
-        if (!selectedCourses.courses){
-            selectedCourses.courses = []
+        if (error) {
+            console.error("Error returning selected_courses: ", error.message)
+            return NextResponse.json({ error: error.message }, { status: 400 })
         }
 
-        selectedCourses.courses.push({id, code});
-
-        console.log("MOST IMPORTANTEST TEST: ", data!.selected_courses)
-
-        //TODO: Add once confirmed that the data is correctly formatted
-        const res = await (await getClient())
-            .from('profiles')
-            .update({'selected_courses': data!.selected_courses})
-            .eq('id', formatted_metadata.id);
-
+        let res = "";
+        if (value=="1A"){
+            await (await getClient())
+                .from('profiles')
+                .update({"1A": courseArray})
+                .eq('id', formatted_metadata.id);
+        } else if (value=="1B"){
+            await (await getClient())
+                .from('profiles')
+                .update({"1B": courseArray})
+                .eq('id', formatted_metadata.id);
+        } else if (value=="2A"){
+            await (await getClient())
+                .from('profiles')
+                .update({"2A": courseArray})
+                .eq('id', formatted_metadata.id);
+        } else if (value=="2B"){
+            await (await getClient())
+                .from('profiles')
+                .update({"2B": courseArray})
+                .eq('id', formatted_metadata.id);
+        } else if (value=="3A"){
+            await (await getClient())
+                .from('profiles')
+                .update({"3A": courseArray})
+                .eq('id', formatted_metadata.id);
+        } else if (value=="3B"){
+            await (await getClient())
+                .from('profiles')
+                .update({"3B": courseArray})
+                .eq('id', formatted_metadata.id);
+        } else if (value=="4A"){
+            await (await getClient())
+                .from('profiles')
+                .update({"4A": courseArray})
+                .eq('id', formatted_metadata.id);
+        } else if (value=="4B"){
+            await (await getClient())
+                .from('profiles')
+                .update({"4B": courseArray})
+                .eq('id', formatted_metadata.id);
+        }
 
         // // Set cookie with some additional options
-        (await cookies()).set('selected_courses', JSON.stringify(data.selected_courses![0]), {
+        (await cookies()).set(`${value}`, JSON.stringify(courseArray), {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'strict',

@@ -43,6 +43,7 @@ const terms = [
 
 export default function DashboardSidebar({ user, loading }: SidebarProps) {
     const [term, setTerm] = useState("")
+    const [courses, setCourses] = useState<JSON[] | null>()
     const [isPending, startTransition] = useTransition();
 
     const storeTerm = async (term: string) => {
@@ -100,6 +101,25 @@ export default function DashboardSidebar({ user, loading }: SidebarProps) {
     }
 
     useEffect(() => {
+        const fetchCourses = async () => {
+            try {
+                // GET Request
+                const response = await fetch('/api/cookies/courses');
+                const { data, error } = await response.json();
+
+                if (error) {
+                    console.error("Error fetching courses:", error);
+                    return;
+                }
+
+                setCourses(data);
+            } catch (error) {
+                console.error("Error updating courses:", error);
+            } finally {
+                console.log("COURSE FETCH COMPLETED");
+            }
+        };
+
         // Fetching the user data from the API
         const fetchTerm = async () => {
             try {
@@ -120,6 +140,7 @@ export default function DashboardSidebar({ user, loading }: SidebarProps) {
             }
         };
 
+        fetchCourses();
         fetchTerm();
     }, []);
 
