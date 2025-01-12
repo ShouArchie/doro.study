@@ -38,7 +38,12 @@ type Summative = {
 
 type SortKey = "date" | "course" | "type"
 
-export function UpcomingSummativesTable({ summatives }: { summatives: Omit<Summative, 'id'>[] }) {
+interface TableProps {
+  summatives: Omit<Summative, 'id'>[],
+  isLoading: boolean
+}
+
+export function UpcomingSummativesTable({ summatives, isLoading }: TableProps) {
   const [checkedItems, setCheckedItems] = useState<Record<string, boolean>>({})
   const [sortBy, setSortBy] = useState<SortKey>("date")
   const [showStrikethrough, setShowStrikethrough] = useState(true)

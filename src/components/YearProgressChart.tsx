@@ -21,8 +21,13 @@ import {
   ChartContainer,
 } from "@/components/ui/chart";
 import { getSemesterDates, calculateSemesterProgress } from "@/components/ui/helpers";
+import { Skeleton } from './ui/skeleton';
 
-export function YearProgressChart() {
+interface YearProgressProps {
+  isLoading: boolean
+}
+
+export function YearProgressChart({isLoading}: YearProgressProps) {
   const { semester, dates } = getSemesterDates();
   const semesterProgress = calculateSemesterProgress(dates);
 
@@ -43,8 +48,16 @@ export function YearProgressChart() {
   return (
     <Card className="w-full flex flex-col h-fit">
       <CardHeader className="text-center">
-        <CardTitle>Semester Progress</CardTitle>
-        <CardDescription>{semester} Semester {dates.start.getFullYear()}</CardDescription>
+        <CardTitle>
+          {isLoading ?
+            <Skeleton className="h-5 w-1/3" />
+            : <>Semester Progress</>
+          }
+        </CardTitle>
+        <CardDescription>
+          {semester} Semester
+          {dates.start.getFullYear()}
+        </CardDescription>
       </CardHeader>
       <CardContent className="flex-grow flex items-center justify-center">
         <ChartContainer
@@ -101,4 +114,3 @@ export function YearProgressChart() {
     </Card>
   );
 }
-

@@ -132,22 +132,29 @@ export function GradetimeChart({ gradeUpdates, courses, visibleCourses, onToggle
   return (
     <Card className="flex flex-col h-fit">
       <CardHeader className="flex-shrink-0">
-        {isLoading?
-        <>
-          <Skeleton className="h-12 w-12 rounded-full" />
-        </> 
-        :
-        <>
-          <CardTitle>Course Performance</CardTitle>
-          <CardDescription>Grade Trends Over Time</CardDescription>
-        </>
-      }
+        <CardTitle>
+          { isLoading?
+          <Skeleton className="h-4 w-1/6"/>
+          :<>Course Performance</>
+          }
+        </CardTitle>
+        <CardDescription>
+          {isLoading?
+            <Skeleton className="h-4 w-1/6"/>
+            :<>Grade Trends Over Time</>
+          }
+          </CardDescription>
       </CardHeader>
       <CardContent className="">
         <div className="mb-4">
-          <h3 className="text-lg font-semibold mb-2">Courses</h3>
+          {isLoading?
+          <Skeleton className="h-5 w-1/12 mb-2"/>
+          :<h3 className="text-lg font-semibold mb-2">Courses</h3>
+          }
           <div className="flex flex-wrap gap-2">
-            {courses.map((course) => (
+            {isLoading ?
+            <Skeleton className="h-5 w-1/2"/>
+            : courses.map((course) => (
               <div key={course} className="flex items-center space-x-1">
                 <Checkbox
                   id={course}
@@ -163,21 +170,29 @@ export function GradetimeChart({ gradeUpdates, courses, visibleCourses, onToggle
               </div>
             ))}
             <div className="flex items-center space-x-1">
-              <Checkbox
-                id="average"
-                checked={visibleCourses.average}
-                onCheckedChange={() => onToggleCourse('average')}
-              />
-              <label
-                htmlFor="average"
-                className="text-xs font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-              >
-                Average
-              </label>
+              {
+                isLoading?
+                  <>
+                    {/* LEAVE EMPTY */}
+                  </>
+                  : <>
+                    <Checkbox
+                      id="average"
+                      checked={visibleCourses.average}
+                      onCheckedChange={() => onToggleCourse('average')}
+                    />
+                    <label
+                      htmlFor="average"
+                      className="text-xs font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                    >
+                      Average
+                    </label>
+                  </>
+              }
             </div>
           </div>
         </div>
-        <div className="flex-grow min-h-0">
+        <div className="flex-grow">
           <ChartContainer config={chartConfig} className="h-full">
             <ResponsiveContainer width="95%" height="100%">
               <LineChart
@@ -254,14 +269,18 @@ export function GradetimeChart({ gradeUpdates, courses, visibleCourses, onToggle
         </div>
       </CardContent>
       <CardFooter className="flex-shrink-0">
-        <div className="flex w-full items-start gap-2 text-xs">
-          <div className="grid gap-1">
-            <div className="flex items-center gap-1 font-medium leading-none">
-              Grade Trends <TrendingUp className="h-3 w-3" />
+        {isLoading ?
+          <Skeleton className="h-3 w-1/12" />
+          :<div className="flex w-full items-start gap-2 text-xs">
+            <div className="grid gap-1">
+              <div className="flex items-center gap-1 font-medium leading-none">
+                  Grade Trends
+                  <TrendingUp className="h-3 w-3" />
+              </div>
             </div>
           </div>
-        </div>
-      </CardFooter>
+        }
+        </CardFooter>
     </Card>
   );
 }

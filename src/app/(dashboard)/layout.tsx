@@ -12,10 +12,6 @@ export default function DashboardLayout({ children }: DashboardProps) {
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
 
-    const isOpen = async () => {
-
-    }
-
     useEffect(() => {
         // Fetching the user data from the API
         const fetchUser = async () => {

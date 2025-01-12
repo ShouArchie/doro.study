@@ -16,7 +16,7 @@ export default function Dashboard() {
   const [courses, setCourses] = useState<string[]>([]);
   const [visibleCourses, setVisibleCourses] = useState<Record<string, boolean>>({});
   const [isLoading, setIsLoading] = useState(true);
-  const [upcomingSummatives, setUpcomingSummatives] = useState([]);
+  const [upcomingSummatives, setUpcomingSummatives] = useState<{date:string, time:string, course:string, type:string}[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -127,33 +127,27 @@ export default function Dashboard() {
 
   return (
     <>
-      {isLoading ? 
-        <div>Loading</div>
-      : <>
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 p-4">
-          <div className="lg:col-span-3 h-fit w-full">
-            <GradetimeChart
-              isLoading={isLoading}
-              gradeUpdates={gradeUpdates}
-              courses={courses}
-              visibleCourses={visibleCourses}
-              onToggleCourse={handleToggleCourse}
-            />
-          </div>
-          <div className="lg:col-span-1 flex flex-col">
-            <div className="lg:row-span-1flex flex-row">
-              <div className="mb-4 h-full">
-                <YearProgressChart /> 
-              </div>
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 p-4">
+        <div className="lg:col-span-3 h-fit w-full">
+          <GradetimeChart
+            isLoading={isLoading}
+            gradeUpdates={gradeUpdates}
+            courses={courses}
+            visibleCourses={visibleCourses}
+            onToggleCourse={handleToggleCourse}
+          />
+        </div>
+        <div className="lg:col-span-1 flex flex-col">
+          <div className="lg:row-span-1flex flex-row">
+            <div className="mb-4 h-full">
+              <YearProgressChart isLoading={isLoading}/>
             </div>
           </div>
         </div>
-        <div className="m-4">
-          <UpcomingSummativesTable summatives={upcomingSummatives} />
-        </div>
-        </>
-      }
+      </div>
+      <div className="m-4">
+        <UpcomingSummativesTable summatives={upcomingSummatives} isLoading={isLoading} />
+      </div>
     </>
   );
 }
-
