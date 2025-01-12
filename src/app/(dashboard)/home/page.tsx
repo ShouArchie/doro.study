@@ -22,14 +22,14 @@ export default function Dashboard() {
     const fetchData = async () => {
       try {
         const mockGradeUpdates: GradeUpdate[] = [
-          { date: "01/02/2025", course: "CS 138", grade: 78 },
-          { date: "01/05/2025", course: "CS 138", grade: 82 },
-          { date: "01/10/2025", course: "CS 138", grade: 80 },
-          { date: "01/25/2025", course: "CS 138", grade: 84 },
-          { date: "02/05/2025", course: "CS 138", grade: 86 },
-          { date: "02/13/2025", course: "CS 138", grade: 90 },
-          { date: "02/20/2025", course: "CS 138", grade: 92 },
-          { date: "02/30/2025", course: "CS 138", grade: 97 },
+          { date: "01/02/2025", course: "CS 138", grade: 60 },
+          { date: "01/05/2025", course: "CS 138", grade: 65 },
+          { date: "01/10/2025", course: "CS 138", grade: 63 },
+          { date: "01/25/2025", course: "CS 138", grade: 65 },
+          { date: "02/05/2025", course: "CS 138", grade: 68 },
+          { date: "02/13/2025", course: "CS 138", grade: 72 },
+          { date: "02/20/2025", course: "CS 138", grade: 75 },
+          { date: "02/30/2025", course: "CS 138", grade: 83 },
 
           { date: "01/04/2025", course: "CS 115", grade: 82 },
           { date: "01/07/2025", course: "CS 115", grade: 88 },
