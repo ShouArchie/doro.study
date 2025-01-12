@@ -23,6 +23,6 @@ export default async function middleware(request: NextRequest){
     return response;
 }
 
-export const config = {
-    matcher: ["/home", "/search"], 
-}
+// export const config = {
+//     matcher: ["/search"], 
+// }

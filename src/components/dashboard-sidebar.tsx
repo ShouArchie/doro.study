@@ -10,11 +10,16 @@ import { toast } from "@/hooks/use-toast";
 import { Skeleton } from "./ui/skeleton";
 import { navigate } from "@/actions/redirect";
 import React from "react";
-
+import Link from 'next/link'
 
 interface SidebarProps {
     user: User | null | undefined,
     loading: boolean,
+}
+
+interface JSONData {
+    id: string,
+    code: string,
 }
 
 const items = [
@@ -43,7 +48,7 @@ const terms = [
 
 export default function DashboardSidebar({ user, loading }: SidebarProps) {
     const [term, setTerm] = useState("")
-    const [courses, setCourses] = useState<JSON[] | null>()
+    const [courses, setCourses] = useState<JSONData[] | null>()
     const [isPending, startTransition] = useTransition();
 
     const storeTerm = async (term: string) => {
@@ -191,6 +196,15 @@ export default function DashboardSidebar({ user, loading }: SidebarProps) {
                         </DropdownMenuContent>
                         <SidebarGroupContent>
                             {/* TODO: Load in courses */}
+                            {!courses?
+                            <p>Enroll in some courses!</p>
+                            :courses.map((course)=>
+                                <Link href="/search">
+                                <SidebarMenuButton key={course.id}>
+                                    {course.code}
+                                </SidebarMenuButton>
+                                </Link>
+                            )}
                         </SidebarGroupContent>
                     </DropdownMenu>
                 </SidebarGroup>
