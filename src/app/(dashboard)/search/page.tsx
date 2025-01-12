@@ -38,7 +38,7 @@ export default function SearchPage() {
     const [courses, setCourses] = useState<string[] | null>(null);
     const [isLoading, setLoading] = useState<boolean>(true);
     const [query, setQuery] = useState("");
-    const [results, setResults] = useState<string[]>([]);
+    const [results, setResults] = useState<[{id: string, code: string, name: string, description: string}]>([{id:"", code:"", name:"", description:""}]);
     const [pinnedItems, setPinnedItems] = useState<Set<string>>(new Set());
     const resultsRef = useRef<HTMLDivElement>(null);
 
@@ -59,10 +59,10 @@ export default function SearchPage() {
                     return lowerItem.includes(lowerValue); // This will match substrings anywhere in the course code
                 });
                 const unpinnedMatches = matches.filter(item => !pinnedItems.has(item));
-                setResults([...allPinnedItems, ...unpinnedMatches]);
+                // setResults([...allPinnedItems, ...unpinnedMatches]);
             } else {
                 const unpinnedItems = courses.filter(item => !pinnedItems.has(item));
-                setResults([...allPinnedItems, ...unpinnedItems]);
+                // setResults([...allPinnedItems, ...unpinnedItems]);
             }
         }
     };
@@ -142,7 +142,7 @@ export default function SearchPage() {
         const fetchCourses = async () => {
             try {
                 const res = await fetch('/api/search/courses/');
-                const { courseCodes, courseNames, courseDesc, error } = await res.json();
+                const { ids, courseCodes, courseNames, courseDescriptions, error } = await res.json();
 
                 if (error) {
                     console.error("ERROR ", error);
@@ -154,8 +154,19 @@ export default function SearchPage() {
                     return;
                 }
 
+                // console.log("COURSE IDS: ", courseDesc)
+
+                const combinedData = ids.map((id:string, index:number) => ({
+                    id: id,
+                    code: courseCodes[index],
+                    name: courseNames[index],
+                    description: courseDescriptions[index]
+                }));
+
+                console.log("IMPORTANT INFO: ", combinedData)
+
                 setCourses(courseCodes || null);
-                setResults(courseCodes || []);
+                setResults(combinedData);
             } catch (error) {
                 console.error("Error fetching course data:", error);
             } finally {
@@ -225,12 +236,8 @@ export default function SearchPage() {
                         Array.from({ length: 10 }, (_, index) => (
                             <div key={index} className="flex items-center space-x-4 rounded-md border p-4 mb-3 h-[90px]">
                                 <div className="flex-1 space-y-1">
-                                    <p className="text-sm font-medium leading-none pb-1">
-                                        <Skeleton className="h-4 w-[5rem]" />
-                                    </p>
-                                    <p className="text-sm text-muted-foreground">
-                                        <Skeleton className="h-3 w-1/12" />
-                                    </p>
+                                    <Skeleton className="h-4 w-[5rem] pb-1 leading-none" />
+                                    <Skeleton className="h-3 w-1/12" />
                                 </div>
                                 <Button variant="ghost" className="p-0">
                                     <Plus />
@@ -242,23 +249,23 @@ export default function SearchPage() {
                         ))
                     ) : (
                         results.map((result) => (
-                            <div key={result} data-course={result} className="flex items-center space-x-4 rounded-md border p-4 mb-3 h-[90px] transition-all duration-300">
+                            <div key={result.id} data-course={result} className="flex items-center space-x-4 rounded-md border p-4 mb-3 h-[90px] transition-all duration-300">
                                 <div className="flex-1 space-y-1">
                                     <p className="text-sm font-medium leading-none pb-1">
-                                        {result}
+                                        {result.code}: {result.name}
                                     </p>
                                     <p className="text-sm text-muted-foreground">
-                                        This is some description
+                                        {result.description}
                                     </p>
                                 </div>
-                                <Button variant="ghost" className="p-0">
+                                <Button variant="ghost" className="p-0" key={result.id}>
                                     <Plus />
                                 </Button>
-                                <Button className="p-0" variant="ghost" onClick={() => togglePin(result)}>
+                                {/* <Button className="p-0" variant="ghost" onClick={() => togglePin(result)}>
                                     <span className="pin-icon transition-transform duration-300">
                                         {pinnedItems.has(result) ? <PinOff /> : <Pin />}
                                     </span>
-                                </Button>
+                                </Button> */}
                             </div>
                         ))
                     )}
@@ -267,4 +274,3 @@ export default function SearchPage() {
         </div>
     );
 }
-
