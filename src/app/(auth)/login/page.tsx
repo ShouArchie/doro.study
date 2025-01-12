@@ -32,7 +32,7 @@ export default function LogIn(){
                 <div className="flex items-center gap-x-3">
                     <TrendingUp />
                     <h3 className="scroll-m-20 text-2xl font-medium tracking-tight">
-                        Doro AI
+                        Doro Study
                     </h3>
                 </div>
                 <div className="relative mt-auto">
