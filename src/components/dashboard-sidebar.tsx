@@ -17,6 +17,11 @@ interface SidebarProps {
     loading: boolean,
 }
 
+interface JSONData {
+    id: string,
+    code: string,
+}
+
 const items = [
     {
         title: "Home",
@@ -43,7 +48,7 @@ const terms = [
 
 export default function DashboardSidebar({ user, loading }: SidebarProps) {
     const [term, setTerm] = useState("")
-    const [courses, setCourses] = useState<JSON[] | null>()
+    const [courses, setCourses] = useState<JSONData[] | null>()
     const [isPending, startTransition] = useTransition();
 
     const storeTerm = async (term: string) => {
@@ -191,6 +196,13 @@ export default function DashboardSidebar({ user, loading }: SidebarProps) {
                         </DropdownMenuContent>
                         <SidebarGroupContent>
                             {/* TODO: Load in courses */}
+                            {!courses?
+                            <p>Enroll in some courses!</p>
+                            :courses.map((course)=>
+                                <SidebarMenuButton key={course.id}>
+                                    {course.code}
+                                </SidebarMenuButton>
+                            )}
                         </SidebarGroupContent>
                     </DropdownMenu>
                 </SidebarGroup>
