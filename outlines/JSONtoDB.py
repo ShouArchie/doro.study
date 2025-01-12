@@ -24,7 +24,6 @@ def json_to_csv_row(course_json: dict) -> list:
         personnel_json,
         schemes_json
     ]
-
     return row
 
 def combine_csvs_in_folder(input_folder: str, output_csv: str):
@@ -42,13 +41,24 @@ def combine_csvs_in_folder(input_folder: str, output_csv: str):
             input_csv_path = os.path.join(input_folder, file_name)
             with open(input_csv_path, "r", newline="") as infile:
                 reader = csv.reader(infile)
+                header_skipped = False
                 for row in reader:
+                    # Skip the header row or invalid rows
+                    if not header_skipped:
+                        header_skipped = True
+                        continue
+                    if not row or not row[0].strip().startswith("\""):
+                        continue
                     try:
-                        course_json = json.loads(row[0])  # Load the JSON from the first column
+                        # Parse the double-encoded JSON string
+                        outer_json = json.loads(row[0].strip())  # First layer of decoding
+                        course_json = json.loads(outer_json)    # Second layer of decoding
                         csv_row = json_to_csv_row(course_json)
                         combined_rows.append(csv_row)
                     except json.JSONDecodeError as e:
                         print(f"Error decoding JSON in file {file_name}, row: {row}. Error: {e}")
+                    except AttributeError as e:
+                        print(f"Invalid JSON structure in file {file_name}, row: {row}. Error: {e}")
 
     # Write all combined rows to the output CSV
     with open(output_csv, "w", newline="") as outfile:
@@ -56,10 +66,11 @@ def combine_csvs_in_folder(input_folder: str, output_csv: str):
         writer.writerow(["Code", "Personnel", "Schemes"])
         writer.writerows(combined_rows)
 
+
 # Example usage
 if __name__ == "__main__":
-    input_folder_path = "input_folder"  # Replace with your folder path containing input CSVs
-    output_csv_path = "combined_output.csv"  # Replace with your desired output CSV file
+    input_folder_path = "outlines\\CSVs"  # Replace with your folder path containing input CSVs
+    output_csv_path = "outlines\\combined_output.csv"  # Replace with your desired output CSV file
 
     combine_csvs_in_folder(input_folder_path, output_csv_path)
     print("All CSVs combined and unpacked successfully.")
