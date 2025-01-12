@@ -199,7 +199,7 @@ export default function DashboardSidebar({ user, loading }: SidebarProps) {
                             {!courses?
                             <p>Enroll in some courses!</p>
                             :courses.map((course)=>
-                                <Link href="/search">
+                                <Link href="/CS138">
                                 <SidebarMenuButton key={course.id}>
                                     {course.code}
                                 </SidebarMenuButton>
