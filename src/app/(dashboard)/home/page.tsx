@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { GradetimeChart } from "@/components/GradetimeChart";
 import { YearProgressChart } from "@/components/YearProgressChart";
 import { UpcomingSummativesTable } from "@/components/UpcomingSummativesTable";
-import { SummativesProgressChart } from "@/components/SummativesProgressChart";
+
 interface GradeUpdate {
   date: string;
   course: string;
@@ -124,13 +124,6 @@ export default function Dashboard() {
       [course]: !prev[course]
     }));
   };
-  const handleSummativeCheck = (id: string, isChecked: boolean) => {
-    setCheckedSummatives(prev => ({
-      ...prev,
-      [id]: isChecked
-    }));
-  };
-
 
   return (
     <>
@@ -149,8 +142,8 @@ export default function Dashboard() {
           </div>
           <div className="lg:col-span-1 flex flex-col">
             <div className="lg:row-span-1flex flex-row">
-              <div className="mb-4">
-                <YearProgressChart />
+              <div className="mb-4 h-full">
+                <YearProgressChart /> 
               </div>
             </div>
           </div>
