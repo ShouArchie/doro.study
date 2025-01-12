@@ -5,12 +5,14 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Button } from "@/components/ui/button"
 import { useState, useEffect, useCallback } from 'react'
 import Image from 'next/image'
+import { Zap, Calendar, BarChart3, BookOpen } from 'lucide-react'
 
 const quotes = [
-  "This is, by far, the best grade tracker for Waterloo students I've ever used. - Oliad",
-  "Wait, when’s that due?' to 'Done and dusted!'—Doro.study keeps you ahead of the curve.",
-  "The beautiful thing about learning is that no one can take it away from you.",
-  "Knowledge is power. Information is liberating. Education is the premise of progress.",
+  "This is, by far, the best grade tracker for Waterloo students I've ever used. - Oliad R",
+  "Wait, when's that due?' to 'Done and dusted!' Doro.study keeps you ahead of the curve.",
+  "If you deployed that right now I would use it ASAP - Matias",
+  "Knowledge is power. Information is liberating. Education is the premise of progress. -O.Choy",
+  "Assignment tracking has never been so easy! - UWaterloo student"
 ]
 
 const carouselImages = [
@@ -33,9 +35,9 @@ export default function Page() {
   useEffect(() => {
     const quoteTimer = setInterval(() => {
       setCurrentQuote((prev) => (prev + 1) % quotes.length)
-    }, 5000) // Change quote every 5 seconds
+    }, 5000)
 
-    const imageTimer = setInterval(nextImage, 3000) // Change image every 5 seconds
+    const imageTimer = setInterval(nextImage, 3000)
 
     return () => {
       clearInterval(quoteTimer)
@@ -45,10 +47,6 @@ export default function Page() {
 
   return (
     <div className="flex h-screen bg-background text-foreground">
-      <div className="fixed top-6 right-8 z-50">
-        <span className="text-3xl font-bold uppercase">doro.study</span>
-      </div>
-      
       {/* Left side with carousel */}
       <div className="w-1/2 relative overflow-hidden">
         {carouselImages.map((image, index) => (
@@ -68,37 +66,74 @@ export default function Page() {
             <div className="absolute inset-0 bg-black/60" />
           </div>
         ))}
-        
+
         {/* Overlay text */}
         <div className="absolute inset-0 flex items-center justify-center z-10 p-8">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white text-center leading-tight">
-            Tracker For The Next Gen of Students
+            Tracker For The Next Generation of Students
           </h1>
         </div>
       </div>
 
-      {/* Right side with animated quote and button */}
-      <div className="w-1/2 flex flex-col items-center justify-center p-8">
-        <div className="h-[100px] mb-8 flex items-center">
-          <AnimatePresence mode="wait">
-            <motion.p
-              key={currentQuote}
-              className="text-xl text-center"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.5 }}
-            >
-              {quotes[currentQuote]}
-            </motion.p>
-          </AnimatePresence>
+      {/* Right side with features, animated quote and button */}
+      <div className="w-1/2 flex flex-col items-center justify-start p-8">
+        {/* Features Section */}
+        <div className="w-full">
+          <h2 className="text-3xl font-bold text-center mb-8 uppercase">DORO.STUDY</h2>
+          <div className="grid grid-cols-1 gap-8">
+            <div className="flex items-start">
+              <Zap className="w-8 h-8 mr-4 text-primary" />
+              <div>
+                <h3 className="text-xl font-semibold mb-2">Quick Setup</h3>
+                <p>Get started in minutes with our intuitive interface.</p>
+              </div>
+            </div>
+            <div className="flex items-start">
+              <Calendar className="w-8 h-8 mr-4 text-primary" />
+              <div>
+                <h3 className="text-xl font-semibold mb-2">Smart Scheduling</h3>
+                <p>Never miss a deadline with our intelligent reminders.</p>
+              </div>
+            </div>
+            <div className="flex items-start">
+              <BarChart3 className="w-8 h-8 mr-4 text-primary" />
+              <div>
+                <h3 className="text-xl font-semibold mb-2">Progress Tracking</h3>
+                <p>Visualize your academic journey with detailed analytics.</p>
+              </div>
+            </div>
+            <div className="flex items-start">
+              <BookOpen className="w-8 h-8 mr-4 text-primary" />
+              <div>
+                <h3 className="text-xl font-semibold mb-2">Course Management</h3>
+                <p>Organize all your courses and assignments in one place.</p>
+              </div>
+            </div>
+          </div>
         </div>
-
-        <Link href="/login">
-          <Button size="lg" className="w-full text-lg">
-            Start Now
-          </Button>
-        </Link>
+        <div className="mt-auto">
+          <div className="h-[100px] flex items-center">
+            <AnimatePresence mode="wait">
+              <motion.p
+                key={currentQuote}
+                className="text-xl text-center"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.5 }}
+              >
+                {quotes[currentQuote]}
+              </motion.p>
+            </AnimatePresence>
+          </div>
+          <div className="mt-4 flex justify-center">
+            <Link href="/login">
+              <Button size="lg" className="text-lg px-8">
+                Start Now
+              </Button>
+            </Link>
+          </div>
+        </div>
       </div>
     </div>
   )
