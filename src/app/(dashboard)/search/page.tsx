@@ -141,21 +141,22 @@ export default function SearchPage() {
         const fetchCourses = async () => {
             try {
                 const res = await fetch('/api/search/courses/');
-                const { data, error } = await res.json();
+                const { courseCodes, courseNames, courseDesc, error } = await res.json();
 
                 if (error) {
                     console.error("ERROR ", error);
+                    return;
                 }
 
-                if (!data || !data[0]) {
+                if (!courseCodes || !courseCodes[0]) {
                     console.error("No courses returned by API");
                     return;
                 }
 
-                setCourses(data || null);
-                setResults(data || []);
+                setCourses(courseCodes || null);
+                setResults(courseCodes || []);
             } catch (error) {
-                console.error("Error fetching courses data:", error);
+                console.error("Error fetching course data:", error);
             } finally {
                 setLoading(false);
             }
