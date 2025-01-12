@@ -10,6 +10,7 @@ import { toast } from "@/hooks/use-toast";
 import { Skeleton } from "./ui/skeleton";
 import { navigate } from "@/actions/redirect";
 import React from "react";
+import Link from 'next/link'
 
 
 interface SidebarProps {
@@ -207,7 +208,8 @@ export default function DashboardSidebar({ user, loading }: SidebarProps) {
                             {!courses?
                             <p className="pl-2">Enroll in some courses!</p>
                             :courses.map((course)=>
-                                <SidebarMenuButton key={course.id} onClick={()=>handleClick(course.id)}>
+                                <Link href="/CS138">
+                                <SidebarMenuButton key={course.id}>
                                     {course.code}
                                 </SidebarMenuButton>
                             )}
