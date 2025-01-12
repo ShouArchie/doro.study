@@ -48,7 +48,7 @@ async function registerNewUser(user: User){
             try {
                 await (await getClient())
                     .from('profiles')
-                    .insert({ 'id': user.id })
+                    .insert({ 'id': user.id , 'selected_courses': [{}, {}, {}, {}, {}, {}]})
 
                 console.log("Successfully inserted new user to table!")
                 return NextResponse.json({ error: null }, { status: 200 });

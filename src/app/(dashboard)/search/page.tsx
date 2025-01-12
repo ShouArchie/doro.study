@@ -133,10 +133,43 @@ export default function SearchPage() {
         }
     };
 
-    const togglePin = (course: string) => {
+    const togglePin = (course: string) => { //TODO: Duplicate
         const isPinning = !pinnedItems.has(course);
         animatePin(course, isPinning);
     };
+
+    const addCourse = async (course_code: string, id: string) => {
+        // const coursesData = await fetch('/api/courses/sidebar')
+        // const res = await coursesData.json()
+
+        // console.log("COURSES RETURNED: ", res)
+
+        const payload = {
+            value: { code:course_code, id:id }
+        }
+
+        const addedCourse = await fetch('/api/courses/sidebar/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        });
+
+        const response = await addedCourse.json();
+        
+        console.log("API POST RESPONSE: ", response)
+
+        // const { data, error } = await response.json();
+
+        // if (error){
+        //     console.error("ERROR:", error)
+        // }
+
+        // if (!data){
+        //     console.error("No courses returned by database")
+        // }
+    }
 
     useEffect(() => {
         const fetchCourses = async () => {
@@ -258,7 +291,7 @@ export default function SearchPage() {
                                         {result.description}
                                     </p>
                                 </div>
-                                <Button variant="ghost" className="p-0" key={result.id}>
+                                <Button variant="ghost" className="p-0" key={result.id} onClick={()=>addCourse(result.code, result.id)}>
                                     <Plus />
                                 </Button>
                                 {/* <Button className="p-0" variant="ghost" onClick={() => togglePin(result)}>
