@@ -1,10 +1,10 @@
 {
-  "name": "doro-ai",
+  "name": "doro-study",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "next build",
+    "build": "next build --no-lint",
     "start": "next start",
     "lint": "next lint"
   },
