@@ -37,7 +37,7 @@ def extract_course_description(file_path):
 
 main_folder_path = "outlines\\SimplifiedHTMLFiles"
 
-# names = []
+names = []
 
 # for folder in os.listdir(main_folder_path):
 #     folder_path = os.path.join(main_folder_path, folder)
@@ -52,17 +52,19 @@ for folder in os.listdir(main_folder_path):
     folder_path = os.path.join(main_folder_path, folder)
     for file in os.listdir(folder_path):
         file_path = os.path.join(folder_path, file)
+        course_name = extract_course_name(file_path)
+        names.append(course_name)
         course_description = extract_course_description(file_path)
         descriptions.append(course_description)
 # print(descriptions)
 
 output_csv = "outlines\\master_outline2.csv"
-input_csv = "outlines\\master_outline.csv"
+input_csv = "outlines\\combined_output.csv"
 df = pd.read_csv(input_csv)
 csv_data = df.values.tolist()
 
 with open(output_csv, "w", newline="") as outfile:
     writer = csv.writer(outfile)
-    writer.writerow(["code", "personnel", "schemes", "course_title", "course_description"])
+    writer.writerow(["course_code", "personnel", "schemes", "course_name", "course_description"])
     for i in range(len(descriptions)):
-        writer.writerow([csv_data[i][0], csv_data[i][1], csv_data[i][2], csv_data[i][2], descriptions[i]])
+        writer.writerow([csv_data[i][0], csv_data[i][1], csv_data[i][2], names[i], descriptions[i]])

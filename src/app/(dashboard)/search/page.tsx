@@ -32,7 +32,8 @@ const departments = [
 export default function SearchPage() {
     gsap.registerPlugin(useGSAP);
 
-    const [faculty, setFaculty] = useState(faculties[0]);
+    const [faculty, setFaculty] = useState("Faculty");
+    const [facultyIndex, setFacultyIndex] = useState<number>(0)
     const [dept, setDept] = useState("Department");
     const [courses, setCourses] = useState<string[] | null>(null);
     const [isLoading, setLoading] = useState<boolean>(true);
@@ -180,17 +181,17 @@ export default function SearchPage() {
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild className="faculty opacity-0">
                         <Button variant="outline">
-                            {faculty.title}
+                            {faculty}
                             <ChevronDown />
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
-                        <DropdownMenuRadioGroup value={faculties[faculty.index].title}>
+                        <DropdownMenuRadioGroup value={faculties[facultyIndex].title}>
                             {faculties.map((facultyOption) => (
                                 <DropdownMenuRadioItem
                                     key={facultyOption.index}
                                     value={facultyOption.title}
-                                    onSelect={() => setFaculty(faculties[facultyOption.index])}
+                                    onSelect={() => {setFacultyIndex(facultyOption.index); setFaculty(facultyOption.title)}}
                                 >
                                     {facultyOption.title}
                                 </DropdownMenuRadioItem>
@@ -208,7 +209,7 @@ export default function SearchPage() {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
                         <DropdownMenuRadioGroup value={dept} onValueChange={setDept}>
-                            {departments[faculty.index].map((departmentOption) => (
+                            {departments[facultyIndex].map((departmentOption) => (
                                 <DropdownMenuRadioItem key={departmentOption} value={departmentOption}>
                                     {departmentOption}
                                 </DropdownMenuRadioItem>
