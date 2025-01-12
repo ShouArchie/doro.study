@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { GradetimeChart } from "@/components/GradetimeChart";
 import { YearProgressChart } from "@/components/YearProgressChart";
 import { UpcomingSummativesTable } from "@/components/UpcomingSummativesTable";
-
+import { SummativesProgressChart } from "@/components/SummativesProgressChart";
 interface GradeUpdate {
   date: string;
   course: string;
@@ -104,6 +104,7 @@ export default function Dashboard() {
           { date: "2025-01-29", time: "1:00 PM", course: "Art", type: "Project" },
           { date: "2025-02-01", time: "3:00 PM", course: "Engineering", type: "Quiz" },
           { date: "2025-02-05", time: "10:30 AM", course: "Math", type: "Assignment" },
+          { date: "2025-04-05", time: "10:30 AM", course: "Math", type: "Assignment" },
         ];
         setUpcomingSummatives(mockSummatives);
 
@@ -123,31 +124,42 @@ export default function Dashboard() {
       [course]: !prev[course]
     }));
   };
+  const handleSummativeCheck = (id: string, isChecked: boolean) => {
+    setCheckedSummatives(prev => ({
+      ...prev,
+      [id]: isChecked
+    }));
+  };
+
 
   return (
     <>
-      {isLoading ? (
+      {isLoading ? 
         <div>Loading</div>
-      ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 p-4 h-screen">
+      : <>
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 p-4">
           <div className="lg:col-span-3 h-fit w-full">
             <GradetimeChart
+              isLoading={isLoading}
               gradeUpdates={gradeUpdates}
               courses={courses}
               visibleCourses={visibleCourses}
               onToggleCourse={handleToggleCourse}
             />
           </div>
-          <div className="lg:col-span-1 flex flex-col h-[calc(60%-1rem)]">
-            <div className="mb-4 h-[calc(70%-1rem)]">
-              <YearProgressChart />
-            </div>
-            <div className="h-[calc(100%-1rem)]">
-              <UpcomingSummativesTable summatives={upcomingSummatives} />
+          <div className="lg:col-span-1 flex flex-col">
+            <div className="lg:row-span-1flex flex-row">
+              <div className="mb-4">
+                <YearProgressChart />
+              </div>
             </div>
           </div>
         </div>
-      )}
+        <div className="m-4">
+          <UpcomingSummativesTable summatives={upcomingSummatives} />
+        </div>
+        </>
+      }
     </>
   );
 }
