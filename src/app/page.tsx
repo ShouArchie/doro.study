@@ -98,7 +98,7 @@ export default function Page() {
 
         <Link href="/login">
           <Button size="lg" className="w-full text-lg">
-            Click to Start Now
+            Start Now
           </Button>
         </Link>
       </div>
