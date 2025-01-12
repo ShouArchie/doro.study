@@ -1,3 +1,7 @@
-                    # if not row or not row[0].strip().startswith("{"):
-                    #     print("1")
-                    #     continue
+result = []
+# flag = False
+# for i in csv_data:
+#     if flag == False:
+#         flag == True
+#         continue
+#     result.append(csv_data[i].append(names[i]))
