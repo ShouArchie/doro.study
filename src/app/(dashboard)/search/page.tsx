@@ -1,7 +1,7 @@
 "use client"
 import { Input } from "@/components/ui/input";
 import { ChevronDown, Pin, PinOff, Plus, Search } from 'lucide-react';
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { Button } from "@/components/ui/button";
@@ -39,6 +39,7 @@ export default function SearchPage() {
     const [query, setQuery] = useState("");
     const [results, setResults] = useState<string[]>([]);
     const [pinnedItems, setPinnedItems] = useState<Set<string>>(new Set());
+    const resultsRef = useRef<HTMLDivElement>(null);
 
     useGSAP(() => {
         const tl = gsap.timeline({ ease: 'power4.inOut' });
@@ -49,19 +50,16 @@ export default function SearchPage() {
 
     const applySearch = (value: string) => {
         if (courses) {
-            // Always include all pinned items
             const allPinnedItems = Array.from(pinnedItems);
-
             if (value.trim() !== "") {
-                // Filter non-pinned items based on the search query
-                const matches = courses.filter((item) =>
-                    !pinnedItems.has(item) && item.toLowerCase().startsWith(value.toLowerCase())
-                );
-
-                // Combine pinned items with matching non-pinned items
-                setResults([...allPinnedItems, ...matches]);
+                const matches = courses.filter((item) => {
+                    const lowerItem = item.toLowerCase();
+                    const lowerValue = value.toLowerCase();
+                    return lowerItem.includes(lowerValue); // This will match substrings anywhere in the course code
+                });
+                const unpinnedMatches = matches.filter(item => !pinnedItems.has(item));
+                setResults([...allPinnedItems, ...unpinnedMatches]);
             } else {
-                // If no search query, show all items with pinned items at the top
                 const unpinnedItems = courses.filter(item => !pinnedItems.has(item));
                 setResults([...allPinnedItems, ...unpinnedItems]);
             }
@@ -74,18 +72,69 @@ export default function SearchPage() {
         applySearch(value);
     };
 
-    const togglePin = (course: string) => {
-        setPinnedItems(prevPinned => {
-            const newPinned = new Set(prevPinned);
-            if (newPinned.has(course)) {
-                newPinned.delete(course);
-            } else {
-                newPinned.add(course);
+    const animatePin = (course: string, isPinning: boolean) => {
+        if (resultsRef.current) {
+            const courseElement = resultsRef.current.querySelector(`[data-course="${course}"]`) as HTMLElement;
+            if (courseElement) {
+                const pinIcon = courseElement.querySelector('.pin-icon') as HTMLElement;
+                const tl = gsap.timeline();
+
+                tl.to(courseElement, {
+                    backgroundColor: isPinning ? 'rgba(250, 204, 21, 0.2)' : 'transparent',
+                    scale: isPinning ? 1.02 : 1,
+                    duration: 0.3,
+                    ease: "power2.inOut"
+                });
+
+                tl.to(pinIcon, {
+                    rotate: isPinning ? '45deg' : '0deg',
+                    scale: isPinning ? 1.2 : 1,
+                    duration: 0.2,
+                    ease: "back.out(2)"
+                }, "-=0.3");
+
+                tl.to(courseElement, {
+                    opacity: 0,
+                    y: isPinning ? -20 : 20,
+                    duration: 0.3,
+                    ease: "power2.inOut",
+                    onComplete: () => {
+                        setPinnedItems(prevPinned => {
+                            const newPinned = new Set(prevPinned);
+                            if (isPinning) {
+                                newPinned.add(course);
+                            } else {
+                                newPinned.delete(course);
+                            }
+                            return newPinned;
+                        });
+
+                        setTimeout(() => {
+                            applySearch(query);
+                            tl.to(courseElement, {
+                                opacity: 1,
+                                y: 0,
+                                duration: 0.4,
+                                scale: 1,
+                                ease: "power2.out"
+                            });
+
+                            gsap.to(courseElement, {
+                                backgroundColor: 'transparent',
+                                duration: 0.7,
+                                delay: 0.3,
+                                ease: "power2.out"
+                            });
+                        }, 0);
+                    }
+                });
             }
-            return newPinned;
-        });
-        // Re-apply the search with the current query
-        applySearch(query);
+        }
+    };
+
+    const togglePin = (course: string) => {
+        const isPinning = !pinnedItems.has(course);
+        animatePin(course, isPinning);
     };
 
     useEffect(() => {
@@ -116,7 +165,6 @@ export default function SearchPage() {
     }, []);
 
     useEffect(() => {
-        // Re-apply search whenever pinnedItems changes
         applySearch(query);
     }, [pinnedItems, courses, query]);
 
@@ -170,7 +218,7 @@ export default function SearchPage() {
             </div>
 
             <ScrollArea className="m-3">
-                <div className="max-h-[84vh]">
+                <div ref={resultsRef} className="max-h-[84vh]">
                     {isLoading ? (
                         Array.from({ length: 10 }, (_, index) => (
                             <div key={index} className="flex items-center space-x-4 rounded-md border p-4 mb-3 h-[90px]">
@@ -192,7 +240,7 @@ export default function SearchPage() {
                         ))
                     ) : (
                         results.map((result) => (
-                            <div key={result} className="flex items-center space-x-4 rounded-md border p-4 mb-3 h-[90px]">
+                            <div key={result} data-course={result} className="flex items-center space-x-4 rounded-md border p-4 mb-3 h-[90px] transition-all duration-300">
                                 <div className="flex-1 space-y-1">
                                     <p className="text-sm font-medium leading-none pb-1">
                                         {result}
@@ -205,7 +253,9 @@ export default function SearchPage() {
                                     <Plus />
                                 </Button>
                                 <Button className="p-0" variant="ghost" onClick={() => togglePin(result)}>
-                                    {pinnedItems.has(result) ? <PinOff /> : <Pin />}
+                                    <span className="pin-icon transition-transform duration-300">
+                                        {pinnedItems.has(result) ? <PinOff /> : <Pin />}
+                                    </span>
                                 </Button>
                             </div>
                         ))
