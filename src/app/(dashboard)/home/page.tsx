@@ -104,6 +104,7 @@ export default function Dashboard() {
           { date: "2025-01-29", time: "1:00 PM", course: "Art", type: "Project" },
           { date: "2025-02-01", time: "3:00 PM", course: "Engineering", type: "Quiz" },
           { date: "2025-02-05", time: "10:30 AM", course: "Math", type: "Assignment" },
+          { date: "2025-04-05", time: "10:30 AM", course: "Math", type: "Assignment" },
         ];
         setUpcomingSummatives(mockSummatives);
 
@@ -141,16 +142,13 @@ export default function Dashboard() {
           </div>
           <div className="lg:col-span-1 flex flex-col">
             <div className="lg:row-span-1flex flex-row">
-              <div className="mb-4">
-                <YearProgressChart />
-              </div>
-              <div className="">
-                <UpcomingSummativesTable summatives={upcomingSummatives} />
+              <div className="mb-4 h-full">
+                <YearProgressChart /> 
               </div>
             </div>
           </div>
         </div>
-        <div className="">
+        <div className="m-4">
           <UpcomingSummativesTable summatives={upcomingSummatives} />
         </div>
         </>

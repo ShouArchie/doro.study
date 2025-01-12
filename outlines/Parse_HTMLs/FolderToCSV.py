@@ -134,6 +134,8 @@ def generate_json_procedural(input_folder, output_folder, api_key):
     for folder_name in os.listdir(input_folder):
         if folder_name == "OPTOM":
             start_processing = True
+        else: 
+            print("folder already processed")
         if start_processing == True:
             folder_path = os.path.join(input_folder, folder_name)
             output_json = os.path.join(output_folder, f"{folder_name}.csv")
@@ -143,7 +145,7 @@ def generate_json_procedural(input_folder, output_folder, api_key):
 
 if __name__ == "__main__":
     # Replace with your actual API key
-    api_key = os.getenv('GEMINI_API_KEY_2')
+    api_key = os.getenv('GEMINI_API_KEY')
 
     if not api_key:
         raise ValueError("API key not found. Make sure GEMINI_API_KEY is set in the .env file.")
