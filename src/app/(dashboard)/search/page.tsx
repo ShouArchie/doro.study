@@ -8,6 +8,12 @@ import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion"
 
 const faculties = [
     { title: "Engineering", index: 0 },
@@ -35,11 +41,11 @@ export default function SearchPage() {
     const [faculty, setFaculty] = useState("Faculty");
     const [facultyIndex, setFacultyIndex] = useState<number>(0)
     const [dept, setDept] = useState("Department");
-    const [courses, setCourses] = useState<string[] | null>(null);
+    const [courses, setCourses] = useState<{id: string, code: string, name: string, description: string}[]>([]);
     const [isLoading, setLoading] = useState<boolean>(true);
     const [query, setQuery] = useState("");
-    const [results, setResults] = useState<[{id: string, code: string, name: string, description: string}]>([{id:"", code:"", name:"", description:""}]);
-    const [pinnedItems, setPinnedItems] = useState<Set<string>>(new Set());
+    const [results, setResults] = useState<{id: string, code: string, name: string, description: string}[]>([]);
+    const [pinnedItems, setPinnedItems] = useState<string[]>([]);
     const resultsRef = useRef<HTMLDivElement>(null);
 
     useGSAP(() => {
@@ -50,20 +56,22 @@ export default function SearchPage() {
     });
 
     const applySearch = (value: string) => {
-        if (courses) {
-            const allPinnedItems = Array.from(pinnedItems);
+        if (courses.length > 0) {
+            let filteredResults = [...courses];
+
             if (value.trim() !== "") {
-                const matches = courses.filter((item) => {
-                    const lowerItem = item.toLowerCase();
+                filteredResults = filteredResults.filter((item) => {
+                    const lowerCode = item.code.toLowerCase();
                     const lowerValue = value.toLowerCase();
-                    return lowerItem.includes(lowerValue); // This will match substrings anywhere in the course code
+                    return lowerCode.includes(lowerValue);
                 });
-                const unpinnedMatches = matches.filter(item => !pinnedItems.has(item));
-                // setResults([...allPinnedItems, ...unpinnedMatches]);
-            } else {
-                const unpinnedItems = courses.filter(item => !pinnedItems.has(item));
-                // setResults([...allPinnedItems, ...unpinnedItems]);
             }
+
+            // Always include pinned items at the top in the order they were pinned
+            const pinnedResults = pinnedItems.map(id => courses.find(course => course.id === id)).filter(Boolean);
+            const unpinnedResults = filteredResults.filter(item => !pinnedItems.includes(item.id));
+
+            setResults([...pinnedResults, ...unpinnedResults]);
         }
     };
 
@@ -73,69 +81,71 @@ export default function SearchPage() {
         applySearch(value);
     };
 
-    const animatePin = (course: string, isPinning: boolean) => {
+    const animateCourseItem = (course: string, isPinning: boolean) => {
         if (resultsRef.current) {
             const courseElement = resultsRef.current.querySelector(`[data-course="${course}"]`) as HTMLElement;
             if (courseElement) {
                 const pinIcon = courseElement.querySelector('.pin-icon') as HTMLElement;
                 const tl = gsap.timeline();
 
+                // Faster initial animation
                 tl.to(courseElement, {
                     backgroundColor: isPinning ? 'rgba(250, 204, 21, 0.2)' : 'transparent',
                     scale: isPinning ? 1.02 : 1,
-                    duration: 0.3,
+                    duration: 0.2,
                     ease: "power2.inOut"
                 });
 
+                // Faster pin icon animation
                 tl.to(pinIcon, {
                     rotate: isPinning ? '45deg' : '0deg',
                     scale: isPinning ? 1.2 : 1,
-                    duration: 0.2,
-                    ease: "back.out(2)"
+                    duration: 0.15,
+                    ease: "back.out(1)"
                 }, "-=0.3");
 
+                // Faster and smoother disappearing animation
                 tl.to(courseElement, {
                     opacity: 0,
-                    y: isPinning ? -20 : 20,
+                    y: isPinning ? -10 : 10,
                     duration: 0.3,
-                    ease: "power2.inOut",
+                    ease: "power2.in",
                     onComplete: () => {
                         setPinnedItems(prevPinned => {
-                            const newPinned = new Set(prevPinned);
                             if (isPinning) {
-                                newPinned.add(course);
+                                return [...prevPinned, course];
                             } else {
-                                newPinned.delete(course);
+                                return prevPinned.filter(id => id !== course);
                             }
-                            return newPinned;
                         });
 
-                        setTimeout(() => {
-                            applySearch(query);
-                            tl.to(courseElement, {
-                                opacity: 1,
-                                y: 0,
-                                duration: 0.4,
-                                scale: 1,
-                                ease: "power2.out"
-                            });
+                        // Immediate state update and re-render
+                        applySearch(query);
 
-                            gsap.to(courseElement, {
-                                backgroundColor: 'transparent',
-                                duration: 0.7,
-                                delay: 0.3,
-                                ease: "power2.out"
-                            });
-                        }, 0);
+                        // Faster reappearing animation
+                        gsap.to(courseElement, {
+                            opacity: 1,
+                            y: 0,
+                            duration: 0.3,
+                            scale: 1,
+                            ease: "power2.out"
+                        });
+
+                        // Faster background color fade
+                        gsap.to(courseElement, {
+                            backgroundColor: 'transparent',
+                            duration: 0.5,
+                            ease: "power2.out"
+                        });
                     }
                 });
             }
         }
     };
 
-    const togglePin = (course: string) => { //TODO: Duplicate
-        const isPinning = !pinnedItems.has(course);
-        animatePin(course, isPinning);
+    const togglePin = (course: {id: string, code: string, name: string, description: string}) => {
+        const isPinning = !pinnedItems.includes(course.id);
+        animateCourseItem(course.id, isPinning);
     };
 
     const addCourse = async (course_code: string, id: string) => {
@@ -187,8 +197,6 @@ export default function SearchPage() {
                     return;
                 }
 
-                // console.log("COURSE IDS: ", courseDesc)
-
                 const combinedData = ids.map((id:string, index:number) => ({
                     id: id,
                     code: courseCodes[index],
@@ -198,7 +206,7 @@ export default function SearchPage() {
 
                 console.log("IMPORTANT INFO: ", combinedData)
 
-                setCourses(courseCodes || null);
+                setCourses(combinedData);
                 setResults(combinedData);
             } catch (error) {
                 console.error("Error fetching course data:", error);
@@ -211,8 +219,10 @@ export default function SearchPage() {
     }, []);
 
     useEffect(() => {
-        applySearch(query);
-    }, [pinnedItems, courses, query]);
+        if (courses.length > 0) {
+            applySearch(query);
+        }
+    }, [pinnedItems, query, courses]);
 
     return (
         <div className="w-full">
@@ -281,29 +291,50 @@ export default function SearchPage() {
                             </div>
                         ))
                     ) : (
-                        results.map((result) => (
-                            <div key={result.id} data-course={result} className="flex items-center space-x-4 rounded-md border p-4 mb-3 h-[90px] transition-all duration-300">
-                                <div className="flex-1 space-y-1">
-                                    <p className="text-sm font-medium leading-none pb-1">
-                                        {result.code}: {result.name}
-                                    </p>
-                                    <p className="text-sm text-muted-foreground">
-                                        {result.description}
-                                    </p>
-                                </div>
-                                <Button variant="ghost" className="p-0" key={result.id} onClick={()=>addCourse(result.code, result.id)}>
-                                    <Plus />
-                                </Button>
-                                {/* <Button className="p-0" variant="ghost" onClick={() => togglePin(result)}>
-                                    <span className="pin-icon transition-transform duration-300">
-                                        {pinnedItems.has(result) ? <PinOff /> : <Pin />}
-                                    </span>
-                                </Button> */}
-                            </div>
-                        ))
+                        <Accordion type="single" collapsible className="w-full">
+                            {results.map((result) => (
+                                <AccordionItem key={result.id} value={result.id} className="border rounded-md mb-3 overflow-hidden">
+                                    <div data-course={result.id} className="flex items-center space-x-4 p-4">
+                                        <div className="flex-1 space-y-1">
+                                            <p className="text-sm font-medium leading-none">
+                                                {result.code}
+                                            </p>
+                                            <p className="text-sm text-muted-foreground">
+                                                {result.name}
+                                            </p>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <AccordionTrigger className="p-0 h-8 w-8" onClick={(e) => e.stopPropagation()}>
+                                            </AccordionTrigger>
+                                            <Button variant="ghost" className="p-0 h-8 w-8">
+                                                <Plus className="h-4 w-4" />
+                                            </Button>
+                                            <Button
+                                              className="p-0 h-8 w-8"
+                                              variant="ghost"
+                                              onClick={(e) => {
+                                                e.stopPropagation();
+                                                togglePin(result);
+                                              }}
+                                            >
+                                              <span className="pin-icon transition-transform duration-300">
+                                                {pinnedItems.includes(result.id) ? <PinOff className="h-4 w-4" /> : <Pin className="h-4 w-4" />}
+                                              </span>
+                                            </Button>
+                                        </div>
+                                    </div>
+                                    <AccordionContent>
+                                        <div className="px-4 pb-0">
+                                            <p className="text-sm text-muted-foreground">{result.description}</p>
+                                        </div>
+                                    </AccordionContent>
+                                </AccordionItem>
+                            ))}
+                        </Accordion>
                     )}
                 </div>
             </ScrollArea>
         </div>
     );
 }
+
