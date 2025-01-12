@@ -41,7 +41,7 @@ export function YearProgressChart() {
   } satisfies ChartConfig;
 
   return (
-    <Card className="w-full flex flex-col">
+    <Card className="w-full flex flex-col h-fit">
       <CardHeader className="text-center">
         <CardTitle>Semester Progress</CardTitle>
         <CardDescription>{semester} Semester {dates.start.getFullYear()}</CardDescription>
@@ -94,7 +94,7 @@ export function YearProgressChart() {
         <div className="flex items-center justify-center gap-2 font-medium leading-none">
           {semesterProgress < 50 ? 'Just getting started!' : 'Over halfway there!'} <TrendingUp className="h-4 w-4" />
         </div>
-        <div className="leading-none text-muted-foreground">
+        <div className="leading-none text-muted-foreground mb-3">
           {semester} semester: {dates.start.toLocaleDateString()} - {dates.end.toLocaleDateString()}
         </div>
       </CardFooter>
