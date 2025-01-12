@@ -150,11 +150,44 @@ export default function SearchPage() {
         animateCourseItem(course.id, isPinning);
     };
 
-    const addCourse = async (course_code: string, id: string) => {
-        // const coursesData = await fetch('/api/courses/sidebar')
-        // const res = await coursesData.json()
+    const fetchCourses = async () => {
+        try {
+            const res = await fetch('/api/search/courses/');
+            const { ids, courseCodes, courseNames, courseDescriptions, error } = await res.json();
 
-        // console.log("COURSES RETURNED: ", res)
+            if (error) {
+                console.error("ERROR ", error);
+                return;
+            }
+
+            if (!courseCodes || !courseCodes[0]) {
+                console.error("No courses returned by API");
+                return;
+            }
+
+            const combinedData = ids.map((id: string, index: number) => ({
+                id: id,
+                code: courseCodes[index],
+                name: courseNames[index],
+                description: courseDescriptions[index]
+            }));
+
+            console.log("IMPORTANT INFO: ", combinedData)
+
+            setCourses(combinedData);
+            setResults(combinedData);
+        } catch (error) {
+            console.error("Error fetching course data:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const addCourse = async (course_code: string, id: string) => {
+    // const coursesData = await fetch('/api/courses/sidebar')
+    // const res = await coursesData.json()
+
+    // console.log("COURSES RETURNED: ", res)
 
         const payload = {
             value: { code:course_code, id:id }
@@ -174,6 +207,7 @@ export default function SearchPage() {
         
         console.log("API POST RESPONSE: ", response)
 
+
         // const { data, error } = await response.json();
 
         // if (error){
@@ -183,42 +217,10 @@ export default function SearchPage() {
         // if (!data){
         //     console.error("No courses returned by database")
         // }
+        fetchCourses()
     }
-
+                                // <SidebarMenuButton key={course.id} onClick={()=>handleClick(course.id)}></SidebarMenuButton>
     useEffect(() => {
-        const fetchCourses = async () => {
-            try {
-                const res = await fetch('/api/search/courses/');
-                const { ids, courseCodes, courseNames, courseDescriptions, error } = await res.json();
-
-                if (error) {
-                    console.error("ERROR ", error);
-                    return;
-                }
-
-                if (!courseCodes || !courseCodes[0]) {
-                    console.error("No courses returned by API");
-                    return;
-                }
-
-                const combinedData = ids.map((id:string, index:number) => ({
-                    id: id,
-                    code: courseCodes[index],
-                    name: courseNames[index],
-                    description: courseDescriptions[index]
-                }));
-
-                console.log("IMPORTANT INFO: ", combinedData)
-
-                setCourses(combinedData);
-                setResults(combinedData);
-            } catch (error) {
-                console.error("Error fetching course data:", error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
         fetchCourses();
     }, []);
 

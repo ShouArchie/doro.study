@@ -51,6 +51,25 @@ export default function DashboardSidebar({ user, loading }: SidebarProps) {
     const [courses, setCourses] = useState<JSONData[] | null>()
     const [isPending, startTransition] = useTransition();
 
+    const fetchCourses = async () => {
+        try {
+            // GET Request
+            const response = await fetch('/api/cookies/courses')
+            const { data, error } = await response.json();
+
+            if (error) {
+                console.error("Error fetching courses:", error);
+                return;
+            }
+
+            setCourses(data)
+        } catch (error) {
+            console.error("Error updating courses:", error);
+        } finally {
+            console.log("COURSE FETCH COMPLETED");
+        }
+    };
+
     const storeTerm = async (term: string) => {
         try {
             // GET Request
@@ -81,6 +100,15 @@ export default function DashboardSidebar({ user, loading }: SidebarProps) {
         }
     }
 
+    const handleClick = (id: string) => {
+        fetchCourses()
+    }
+
+    const handleSelect = (term: string) => {
+        storeTerm(term)
+        fetchCourses()
+    }
+
     const handleLoading = () => {
         startTransition(async () => {
             try {
@@ -106,25 +134,6 @@ export default function DashboardSidebar({ user, loading }: SidebarProps) {
     }
 
     useEffect(() => {
-        const fetchCourses = async () => {
-            try {
-                // GET Request
-                const response = await fetch('/api/cookies/courses');
-                const { data, error } = await response.json();
-
-                if (error) {
-                    console.error("Error fetching courses:", error);
-                    return;
-                }
-
-                setCourses(data);
-            } catch (error) {
-                console.error("Error updating courses:", error);
-            } finally {
-                console.log("COURSE FETCH COMPLETED");
-            }
-        };
-
         // Fetching the user data from the API
         const fetchTerm = async () => {
             try {
@@ -158,7 +167,6 @@ export default function DashboardSidebar({ user, loading }: SidebarProps) {
             <SidebarContent>
                 <SidebarGroup>
                     <SidebarMenu>
-                        
                         {items.map((item) => (
                             <SidebarMenuItem key={item.title}>
                                 <SidebarMenuButton asChild>
@@ -189,7 +197,7 @@ export default function DashboardSidebar({ user, loading }: SidebarProps) {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent side="bottom" className="w-[--radix--popper-anchor-width]">
                             {terms.map((term) => (
-                                <DropdownMenuItem key={term} onSelect={()=>storeTerm(term)}>
+                                <DropdownMenuItem key={term} onSelect={()=>handleSelect(term)}>
                                     <span>{term}</span>
                                 </DropdownMenuItem>
                             ))}
@@ -197,9 +205,9 @@ export default function DashboardSidebar({ user, loading }: SidebarProps) {
                         <SidebarGroupContent>
                             {/* TODO: Load in courses */}
                             {!courses?
-                            <p>Enroll in some courses!</p>
+                            <p className="pl-2">Enroll in some courses!</p>
                             :courses.map((course)=>
-                                <SidebarMenuButton key={course.id}>
+                                <SidebarMenuButton key={course.id} onClick={()=>handleClick(course.id)}>
                                     {course.code}
                                 </SidebarMenuButton>
                             )}
