@@ -81,67 +81,62 @@ export default function SearchPage() {
         applySearch(value);
     };
 
-    const animateCourseItem = (courseElement: HTMLElement, isPinning: boolean) => {
-    return new Promise<void>((resolve) => {
-        const tl = gsap.timeline({
-            onComplete: () => resolve()
-        });
-
-        // First scale and change color
-        tl.to(courseElement, {
-            scale: isPinning ? 1.05 : 0.95,
-            backgroundColor: isPinning ? 'rgba(250, 204, 21, 0.2)' : 'rgba(255, 255, 255, 0.2)',
-            duration: 0.3,
-            ease: "power2.inOut"
-        });
-
-        // Fade out
-        tl.to(courseElement, {
-            opacity: 0,
-            duration: 0.3,
-            ease: "power2.in"
-        });
-
-        // Move to new position, reappear, scale back, and change color
-        tl.to(courseElement, {
-            y: isPinning ? -courseElement.offsetHeight : courseElement.offsetHeight,
-            opacity: 1,
-            scale: 1,
-            backgroundColor: isPinning ? 'rgba(250, 204, 21, 0.1)' : 'transparent',
-            duration: 0.4,
-            ease: "power2.out",
-            onComplete: () => {
-                // Reset the y position after the animation
-                gsap.set(courseElement, { y: 0 });
+    const animateCourseItem = (course: string, isPinning: boolean) => {
+        if (resultsRef.current) {
+            const courseElement = resultsRef.current.querySelector(`[data-course="${course}"]`) as HTMLElement;
+            if (courseElement) {
+                const pinIcon = courseElement.querySelector('.pin-icon') as HTMLElement;
+                const tl = gsap.timeline();
+                tl.to(courseElement, {
+                    backgroundColor: isPinning ? 'rgba(250, 204, 21, 0.2)' : 'transparent',
+                    scale: isPinning ? 1.02 : 1,
+                    duration: 0.3,
+                    ease: "power2.inOut"
+                });
+                tl.to(pinIcon, {
+                    rotate: isPinning ? '45deg' : '0deg',
+                    scale: isPinning ? 1.2 : 1,
+                    duration: 0.2,
+                    ease: "back.out(2)"
+                }, "-=0.3");
+                tl.to(courseElement, {
+                    opacity: 0,
+                    y: isPinning ? -20 : 20,
+                    duration: 0.3,
+                    ease: "power2.inOut",
+                    onComplete: () => {
+                        setPinnedItems(prevPinned => {
+                            if (isPinning) {
+                                return [...prevPinned, course];
+                            } else {
+                                return prevPinned.filter(id => id !== course);
+                            }
+                        });
+                        setTimeout(() => {
+                            applySearch(query);
+                            tl.to(courseElement, {
+                                opacity: 1,
+                                y: 0,
+                                duration: 0.4,
+                                scale: 1,
+                                ease: "power2.out"
+                            });
+                            gsap.to(courseElement, {
+                                backgroundColor: 'transparent',
+                                duration: 0.7,
+                                delay: 0.3,
+                                ease: "power2.out"
+                            });
+                        }, 0);
+                    }
+                });
             }
-        });
-
-        // Final color fade
-        tl.to(courseElement, {
-            backgroundColor: 'transparent',
-            duration: 0.3,
-            ease: "power2.inOut"
-        });
-    });
-};
-
-    const togglePin = async (course: {id: string, code: string, name: string, description: string}) => {
-        const isPinning = !pinnedItems.includes(course.id);
-        const courseElement = resultsRef.current?.querySelector(`[data-course="${course.id}"]`) as HTMLElement;
-
-        if (courseElement) {
-            await animateCourseItem(courseElement, isPinning);
         }
+    };
 
-        setPinnedItems(prevPinned => {
-            if (isPinning) {
-                return [...prevPinned, course.id];
-            } else {
-                return prevPinned.filter(id => id !== course.id);
-            }
-        });
-
-        applySearch(query);
+    const togglePin = (course: {id: string, code: string, name: string, description: string}) => {
+        const isPinning = !pinnedItems.includes(course.id);
+        animateCourseItem(course.id, isPinning);
     };
 
     useEffect(() => {
