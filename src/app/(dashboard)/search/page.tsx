@@ -39,7 +39,7 @@ export default function SearchPage() {
     const [isLoading, setLoading] = useState<boolean>(true);
     const [query, setQuery] = useState("");
     const [results, setResults] = useState<[{id: string, code: string, name: string, description: string}]>([{id:"", code:"", name:"", description:""}]);
-    const [pinnedItems, setPinnedItems] = useState<Set<string>>(new Set());
+    const [pinnedItems, setPinnedItems] = useState<Set<{id: string, code: string, name: string, description: string}>>(new Set());
     const resultsRef = useRef<HTMLDivElement>(null);
 
     useGSAP(() => {
@@ -53,16 +53,16 @@ export default function SearchPage() {
         if (courses) {
             const allPinnedItems = Array.from(pinnedItems);
             if (value.trim() !== "") {
-                const matches = courses.filter((item) => {
-                    const lowerItem = item.toLowerCase();
+                const matches = results.filter((item) => {
+                    const lowerItem = `${item.code} ${item.name}`.toLowerCase();
                     const lowerValue = value.toLowerCase();
-                    return lowerItem.includes(lowerValue); // This will match substrings anywhere in the course code
+                    return lowerItem.includes(lowerValue);
                 });
                 const unpinnedMatches = matches.filter(item => !pinnedItems.has(item));
-                // setResults([...allPinnedItems, ...unpinnedMatches]);
+                setResults([...allPinnedItems, ...unpinnedMatches]);
             } else {
-                const unpinnedItems = courses.filter(item => !pinnedItems.has(item));
-                // setResults([...allPinnedItems, ...unpinnedItems]);
+                const unpinnedItems = results.filter(item => !pinnedItems.has(item));
+                setResults([...allPinnedItems, ...unpinnedItems]);
             }
         }
     };
@@ -73,9 +73,9 @@ export default function SearchPage() {
         applySearch(value);
     };
 
-    const animatePin = (course: string, isPinning: boolean) => {
+    const animatePin = (course: {id: string, code: string, name: string, description: string}, isPinning: boolean) => {
         if (resultsRef.current) {
-            const courseElement = resultsRef.current.querySelector(`[data-course="${course}"]`) as HTMLElement;
+            const courseElement = resultsRef.current.querySelector(`[data-course="${course.id}"]`) as HTMLElement;
             if (courseElement) {
                 const pinIcon = courseElement.querySelector('.pin-icon') as HTMLElement;
                 const tl = gsap.timeline();
@@ -133,8 +133,8 @@ export default function SearchPage() {
         }
     };
 
-    const togglePin = (course: string) => {
-        const isPinning = !pinnedItems.has(course);
+    const togglePin = (course: {id: string, code: string, name: string, description: string}) => {
+        const isPinning = !Array.from(pinnedItems).some(item => item.id === course.id);
         animatePin(course, isPinning);
     };
 
@@ -249,7 +249,7 @@ export default function SearchPage() {
                         ))
                     ) : (
                         results.map((result) => (
-                            <div key={result.id} data-course={result} className="flex items-center space-x-4 rounded-md border p-4 mb-3 h-[90px] transition-all duration-300">
+                            <div key={result.id} data-course={result.id} className="flex items-center space-x-4 rounded-md border p-4 mb-3 h-[90px] transition-all duration-300">
                                 <div className="flex-1 space-y-1">
                                     <p className="text-sm font-medium leading-none pb-1">
                                         {result.code}: {result.name}
@@ -261,11 +261,11 @@ export default function SearchPage() {
                                 <Button variant="ghost" className="p-0" key={result.id}>
                                     <Plus />
                                 </Button>
-                                {/* <Button className="p-0" variant="ghost" onClick={() => togglePin(result)}>
+                                <Button className="p-0" variant="ghost" onClick={() => togglePin(result)}>
                                     <span className="pin-icon transition-transform duration-300">
-                                        {pinnedItems.has(result) ? <PinOff /> : <Pin />}
+                                        {Array.from(pinnedItems).some(item => item.id === result.id) ? <PinOff /> : <Pin />}
                                     </span>
-                                </Button> */}
+                                </Button>
                             </div>
                         ))
                     )}
@@ -274,3 +274,4 @@ export default function SearchPage() {
         </div>
     );
 }
+
