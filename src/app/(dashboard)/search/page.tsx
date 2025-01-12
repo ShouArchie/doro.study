@@ -41,11 +41,11 @@ export default function SearchPage() {
     const [faculty, setFaculty] = useState("Faculty");
     const [facultyIndex, setFacultyIndex] = useState<number>(0)
     const [dept, setDept] = useState("Department");
-    const [courses, setCourses] = useState<string[] | null>(null);
+    const [courses, setCourses] = useState<{id: string, code: string, name: string, description: string}[]>([]);
     const [isLoading, setLoading] = useState<boolean>(true);
     const [query, setQuery] = useState("");
-    const [results, setResults] = useState<[{id: string, code: string, name: string, description: string}]>([{id:"", code:"", name:"", description:""}]);
-    const [pinnedItems, setPinnedItems] = useState<Set<{id: string, code: string, name: string, description: string}>>(new Set());
+    const [results, setResults] = useState<{id: string, code: string, name: string, description: string}[]>([]);
+    const [pinnedItems, setPinnedItems] = useState<string[]>([]);
     const resultsRef = useRef<HTMLDivElement>(null);
 
     useGSAP(() => {
@@ -56,20 +56,22 @@ export default function SearchPage() {
     });
 
     const applySearch = (value: string) => {
-        if (courses) {
-            const allPinnedItems = Array.from(pinnedItems);
+        if (courses.length > 0) {
+            let filteredResults = [...courses];
+
             if (value.trim() !== "") {
-                const matches = results.filter((item) => {
-                    const lowerItem = `${item.code} ${item.name}`.toLowerCase();
+                filteredResults = filteredResults.filter((item) => {
+                    const lowerCode = item.code.toLowerCase();
                     const lowerValue = value.toLowerCase();
-                    return lowerItem.includes(lowerValue);
+                    return lowerCode.includes(lowerValue);
                 });
-                const unpinnedMatches = matches.filter(item => !pinnedItems.has(item));
-                setResults([...allPinnedItems, ...unpinnedMatches]);
-            } else {
-                const unpinnedItems = results.filter(item => !pinnedItems.has(item));
-                setResults([...allPinnedItems, ...unpinnedItems]);
             }
+
+            // Always include pinned items at the top in the order they were pinned
+            const pinnedResults = pinnedItems.map(id => courses.find(course => course.id === id)).filter(Boolean);
+            const unpinnedResults = filteredResults.filter(item => !pinnedItems.includes(item.id));
+
+            setResults([...pinnedResults, ...unpinnedResults]);
         }
     };
 
@@ -79,69 +81,67 @@ export default function SearchPage() {
         applySearch(value);
     };
 
-    const animatePin = (course: {id: string, code: string, name: string, description: string}, isPinning: boolean) => {
-        if (resultsRef.current) {
-            const courseElement = resultsRef.current.querySelector(`[data-course="${course.id}"]`) as HTMLElement;
-            if (courseElement) {
-                const pinIcon = courseElement.querySelector('.pin-icon') as HTMLElement;
-                const tl = gsap.timeline();
+    const animateCourseItem = (courseElement: HTMLElement, isPinning: boolean) => {
+    return new Promise<void>((resolve) => {
+        const tl = gsap.timeline({
+            onComplete: () => resolve()
+        });
 
-                tl.to(courseElement, {
-                    backgroundColor: isPinning ? 'rgba(250, 204, 21, 0.2)' : 'transparent',
-                    scale: isPinning ? 1.02 : 1,
-                    duration: 0.3,
-                    ease: "power2.inOut"
-                });
+        // First scale and change color
+        tl.to(courseElement, {
+            scale: isPinning ? 1.05 : 0.95,
+            backgroundColor: isPinning ? 'rgba(250, 204, 21, 0.2)' : 'rgba(255, 255, 255, 0.2)',
+            duration: 0.3,
+            ease: "power2.inOut"
+        });
 
-                tl.to(pinIcon, {
-                    rotate: isPinning ? '45deg' : '0deg',
-                    scale: isPinning ? 1.2 : 1,
-                    duration: 0.2,
-                    ease: "back.out(2)"
-                }, "-=0.3");
+        // Fade out
+        tl.to(courseElement, {
+            opacity: 0,
+            duration: 0.3,
+            ease: "power2.in"
+        });
 
-                tl.to(courseElement, {
-                    opacity: 0,
-                    y: isPinning ? -20 : 20,
-                    duration: 0.3,
-                    ease: "power2.inOut",
-                    onComplete: () => {
-                        setPinnedItems(prevPinned => {
-                            const newPinned = new Set(prevPinned);
-                            if (isPinning) {
-                                newPinned.add(course);
-                            } else {
-                                newPinned.delete(course);
-                            }
-                            return newPinned;
-                        });
-
-                        setTimeout(() => {
-                            applySearch(query);
-                            tl.to(courseElement, {
-                                opacity: 1,
-                                y: 0,
-                                duration: 0.4,
-                                scale: 1,
-                                ease: "power2.out"
-                            });
-
-                            gsap.to(courseElement, {
-                                backgroundColor: 'transparent',
-                                duration: 0.7,
-                                delay: 0.3,
-                                ease: "power2.out"
-                            });
-                        }, 0);
-                    }
-                });
+        // Move to new position, reappear, scale back, and change color
+        tl.to(courseElement, {
+            y: isPinning ? -courseElement.offsetHeight : courseElement.offsetHeight,
+            opacity: 1,
+            scale: 1,
+            backgroundColor: isPinning ? 'rgba(250, 204, 21, 0.1)' : 'transparent',
+            duration: 0.4,
+            ease: "power2.out",
+            onComplete: () => {
+                // Reset the y position after the animation
+                gsap.set(courseElement, { y: 0 });
             }
-        }
-    };
+        });
 
-    const togglePin = (course: {id: string, code: string, name: string, description: string}) => {
-        const isPinning = !Array.from(pinnedItems).some(item => item.id === course.id);
-        animatePin(course, isPinning);
+        // Final color fade
+        tl.to(courseElement, {
+            backgroundColor: 'transparent',
+            duration: 0.3,
+            ease: "power2.inOut"
+        });
+    });
+};
+
+    const togglePin = async (course: {id: string, code: string, name: string, description: string}) => {
+        const isPinning = !pinnedItems.includes(course.id);
+        const courseElement = resultsRef.current?.querySelector(`[data-course="${course.id}"]`) as HTMLElement;
+
+        if (courseElement) {
+            await animateCourseItem(courseElement, isPinning);
+        }
+
+        setPinnedItems(prevPinned => {
+            if (isPinning) {
+                return [...prevPinned, course.id];
+            } else {
+                return prevPinned.filter(id => id !== course.id);
+            }
+        });
+
+        applySearch(query);
     };
 
     useEffect(() => {
@@ -169,7 +169,7 @@ export default function SearchPage() {
 
                 console.log("IMPORTANT INFO: ", combinedData)
 
-                setCourses(courseCodes || null);
+                setCourses(combinedData);
                 setResults(combinedData);
             } catch (error) {
                 console.error("Error fetching course data:", error);
@@ -182,8 +182,10 @@ export default function SearchPage() {
     }, []);
 
     useEffect(() => {
-        applySearch(query);
-    }, [pinnedItems, courses, query]);
+        if (courses.length > 0) {
+            applySearch(query);
+        }
+    }, [pinnedItems, query, courses]);
 
     return (
         <div className="w-full">
@@ -255,7 +257,7 @@ export default function SearchPage() {
                         <Accordion type="single" collapsible className="w-full">
                             {results.map((result) => (
                                 <AccordionItem key={result.id} value={result.id} className="border rounded-md mb-3 overflow-hidden">
-                                    <div className="flex items-center space-x-4 p-4">
+                                    <div data-course={result.id} className="flex items-center space-x-4 p-4">
                                         <div className="flex-1 space-y-1">
                                             <p className="text-sm font-medium leading-none">
                                                 {result.code}
@@ -265,21 +267,30 @@ export default function SearchPage() {
                                             </p>
                                         </div>
                                         <div className="flex items-center space-x-2">
+                                            <AccordionTrigger className="p-0 h-8 w-8" onClick={(e) => e.stopPropagation()}>
+                                                <div className="p-0 h-8 w-8 flex items-center justify-center">
+                                                    <ChevronDown className="h-4 w-4 transition-transform duration-200" />
+                                                </div>
+                                            </AccordionTrigger>
                                             <Button variant="ghost" className="p-0 h-8 w-8">
                                                 <Plus className="h-4 w-4" />
                                             </Button>
-                                            <Button className="p-0 h-8 w-8" variant="ghost" onClick={() => togglePin(result)}>
-                                                <span className="pin-icon transition-transform duration-300">
-                                                    {Array.from(pinnedItems).some(item => item.id === result.id) ? <PinOff className="h-4 w-4" /> : <Pin className="h-4 w-4" />}
-                                                </span>
+                                            <Button
+                                              className="p-0 h-8 w-8"
+                                              variant="ghost"
+                                              onClick={(e) => {
+                                                e.stopPropagation();
+                                                togglePin(result);
+                                              }}
+                                            >
+                                              <span className="pin-icon transition-transform duration-300">
+                                                {pinnedItems.includes(result.id) ? <PinOff className="h-4 w-4" /> : <Pin className="h-4 w-4" />}
+                                              </span>
                                             </Button>
-                                            <AccordionTrigger className="p-0 h-8 w-8">
-                                                <ChevronDown className="h-4 w-4 transition-transform duration-200" />
-                                            </AccordionTrigger>
                                         </div>
                                     </div>
                                     <AccordionContent>
-                                        <div className="px-4 pb-4">
+                                        <div className="px-4 pb-0">
                                             <p className="text-sm text-muted-foreground">{result.description}</p>
                                         </div>
                                     </AccordionContent>
