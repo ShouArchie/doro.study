@@ -90,7 +90,7 @@ export default function Dashboard() {
         setCourses(uniqueCourses);
 
         const initialVisibleCourses = uniqueCourses.reduce((acc, course) => {
-          acc[course] = true;
+          acc[course] = false;
           return acc;
         }, {} as Record<string, boolean>);
         setVisibleCourses(initialVisibleCourses);
