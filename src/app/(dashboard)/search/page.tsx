@@ -8,6 +8,12 @@ import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion"
 
 const faculties = [
     { title: "Engineering", index: 0 },
@@ -154,8 +160,6 @@ export default function SearchPage() {
                     return;
                 }
 
-                // console.log("COURSE IDS: ", courseDesc)
-
                 const combinedData = ids.map((id:string, index:number) => ({
                     id: id,
                     code: courseCodes[index],
@@ -248,26 +252,40 @@ export default function SearchPage() {
                             </div>
                         ))
                     ) : (
-                        results.map((result) => (
-                            <div key={result.id} data-course={result.id} className="flex items-center space-x-4 rounded-md border p-4 mb-3 h-[90px] transition-all duration-300">
-                                <div className="flex-1 space-y-1">
-                                    <p className="text-sm font-medium leading-none pb-1">
-                                        {result.code}: {result.name}
-                                    </p>
-                                    <p className="text-sm text-muted-foreground">
-                                        {result.description}
-                                    </p>
-                                </div>
-                                <Button variant="ghost" className="p-0" key={result.id}>
-                                    <Plus />
-                                </Button>
-                                <Button className="p-0" variant="ghost" onClick={() => togglePin(result)}>
-                                    <span className="pin-icon transition-transform duration-300">
-                                        {Array.from(pinnedItems).some(item => item.id === result.id) ? <PinOff /> : <Pin />}
-                                    </span>
-                                </Button>
-                            </div>
-                        ))
+                        <Accordion type="single" collapsible className="w-full">
+                            {results.map((result) => (
+                                <AccordionItem key={result.id} value={result.id} className="border rounded-md mb-3 overflow-hidden">
+                                    <div className="flex items-center space-x-4 p-4">
+                                        <div className="flex-1 space-y-1">
+                                            <p className="text-sm font-medium leading-none">
+                                                {result.code}
+                                            </p>
+                                            <p className="text-sm text-muted-foreground">
+                                                {result.name}
+                                            </p>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <Button variant="ghost" className="p-0 h-8 w-8">
+                                                <Plus className="h-4 w-4" />
+                                            </Button>
+                                            <Button className="p-0 h-8 w-8" variant="ghost" onClick={() => togglePin(result)}>
+                                                <span className="pin-icon transition-transform duration-300">
+                                                    {Array.from(pinnedItems).some(item => item.id === result.id) ? <PinOff className="h-4 w-4" /> : <Pin className="h-4 w-4" />}
+                                                </span>
+                                            </Button>
+                                            <AccordionTrigger className="p-0 h-8 w-8">
+                                                <ChevronDown className="h-4 w-4 transition-transform duration-200" />
+                                            </AccordionTrigger>
+                                        </div>
+                                    </div>
+                                    <AccordionContent>
+                                        <div className="px-4 pb-4">
+                                            <p className="text-sm text-muted-foreground">{result.description}</p>
+                                        </div>
+                                    </AccordionContent>
+                                </AccordionItem>
+                            ))}
+                        </Accordion>
                     )}
                 </div>
             </ScrollArea>
