@@ -69,7 +69,7 @@ export function AssignmentsTable() {
                   type="text"
                   value={tempGrades[assignment.id] !== undefined ? tempGrades[assignment.id] : assignment.grade}
                   onChange={(e) => handleGradeChange(assignment.id, e.target.value)}
-                  className="w-20 bg-gray-800 text-white border-gray-700"
+                  className="px-2 py-0 w-1/3 bg-gray-800 text-white border-gray-700"
                   placeholder="Grade"
                 />
               </TableCell>
