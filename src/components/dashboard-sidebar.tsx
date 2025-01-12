@@ -208,10 +208,12 @@ export default function DashboardSidebar({ user, loading }: SidebarProps) {
                             {!courses?
                             <p className="pl-2">Enroll in some courses!</p>
                             :courses.map((course)=>
-                                <Link href="/CS138">
+                                <>
+                                <Link href="/CS138"/>
                                 <SidebarMenuButton key={course.id}>
                                     {course.code}
                                 </SidebarMenuButton>
+                                </>
                             )}
                         </SidebarGroupContent>
                     </DropdownMenu>
