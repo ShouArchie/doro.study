@@ -7,8 +7,6 @@ export async function GET(){
 
         const { data, error } = await courseQuery
 
-        console.log(data);
-
         if (error) {
             console.error("Error fetching classes", error.message);
             return NextResponse.json({ error: error.message }, { status: 400 });
@@ -19,7 +17,7 @@ export async function GET(){
             return NextResponse.json({ error: "No classes found" }, { status: 404 });
         }
 
-        console.log("Class List Updated");
+        console.log("Courses returned successfully");
         return NextResponse.json({ data }, { status: 200 });
     }
     catch (error) {
