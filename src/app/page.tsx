@@ -3,13 +3,12 @@
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Button } from "@/components/ui/button"
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel"
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import Image from 'next/image'
 
 const quotes = [
-  "Learning is a treasure that will follow its owner everywhere.",
-  "Education is not preparation for life; education is life itself.",
+  "This is, by far, the best grade tracker for Waterloo students I've ever used. - Oliad",
+  "Wait, when’s that due?' to 'Done and dusted!'—Doro.study keeps you ahead of the curve.",
   "The beautiful thing about learning is that no one can take it away from you.",
   "Knowledge is power. Information is liberating. Education is the premise of progress.",
 ]
@@ -25,14 +24,24 @@ const carouselImages = [
 
 export default function Page() {
   const [currentQuote, setCurrentQuote] = useState(0)
+  const [currentImage, setCurrentImage] = useState(0)
+
+  const nextImage = useCallback(() => {
+    setCurrentImage((prev) => (prev + 1) % carouselImages.length)
+  }, [])
 
   useEffect(() => {
-    const timer = setInterval(() => {
+    const quoteTimer = setInterval(() => {
       setCurrentQuote((prev) => (prev + 1) % quotes.length)
     }, 5000) // Change quote every 5 seconds
 
-    return () => clearInterval(timer)
-  }, [])
+    const imageTimer = setInterval(nextImage, 3000) // Change image every 5 seconds
+
+    return () => {
+      clearInterval(quoteTimer)
+      clearInterval(imageTimer)
+    }
+  }, [nextImage])
 
   return (
     <div className="flex h-screen bg-background text-foreground">
@@ -41,35 +50,24 @@ export default function Page() {
       </div>
       
       {/* Left side with carousel */}
-      <div className="w-1/2 relative">
-        <Carousel 
-          className="w-full h-full"
-          opts={{
-            align: "start",
-            loop: true,
-          }}
-          autoPlay={true}
-          interval={5000}
-        >
-          <CarouselContent className="h-full">
-            {carouselImages.map((image, index) => (
-              <CarouselItem key={index} className="h-full">
-                <div className="relative w-full h-full">
-                  <Image
-                    src={image.src}
-                    alt={`Carousel image ${index + 1}`}
-                    fill
-                    style={{ objectFit: 'cover' }}
-                    priority={index === 0}
-                  />
-                  <div className="absolute inset-0 bg-black/60" />
-                </div>
-              </CarouselItem>
-            ))}
-          </CarouselContent>
-          {/*<CarouselPrevious className="left-4" />
-          <CarouselNext className="right-4" />*/}
-        </Carousel>
+      <div className="w-1/2 relative overflow-hidden">
+        {carouselImages.map((image, index) => (
+          <div
+            key={index}
+            className={`absolute inset-0 transition-opacity duration-1000 ${
+              index === currentImage ? 'opacity-100' : 'opacity-0'
+            }`}
+          >
+            <Image
+              src={image.src}
+              alt={`Carousel image ${index + 1}`}
+              fill
+              style={{ objectFit: 'cover' }}
+              priority={index === 0}
+            />
+            <div className="absolute inset-0 bg-black/60" />
+          </div>
+        ))}
         
         {/* Overlay text */}
         <div className="absolute inset-0 flex items-center justify-center z-10 p-8">
