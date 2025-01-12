@@ -81,7 +81,7 @@ export default function DashboardLayout({ children }: DashboardProps) {
 
     // TODO: Create a READ COOKIES API ENDPOINT FOR SIDEBAR PROVIDER OPEN={} 
 
-    return <div className="flex flex-row">
+    return <div className="flex flex-row overflow-x-hidden">
         <SidebarProvider>
             <DashboardSidebar user={user} loading={loading} />
             {/* <SidebarTrigger className="-ml-1 mx-2 my-4 px-2" /> */}

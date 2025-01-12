@@ -9,18 +9,45 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      outlines: {
+        Row: {
+          course_code: string
+          course_name: string | null
+          id: string
+          personnel: Json | null
+          schemes: Json | null
+        }
+        Insert: {
+          course_code: string
+          course_name?: string | null
+          id?: string
+          personnel?: Json | null
+          schemes?: Json | null
+        }
+        Update: {
+          course_code?: string
+          course_name?: string | null
+          id?: string
+          personnel?: Json | null
+          schemes?: Json | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string | null
           id: string
+          selected_courses: Json[] | null
         }
         Insert: {
           created_at?: string | null
           id?: string
+          selected_courses?: Json[] | null
         }
         Update: {
           created_at?: string | null
           id?: string
+          selected_courses?: Json[] | null
         }
         Relationships: []
       }
