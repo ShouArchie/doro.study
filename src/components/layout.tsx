@@ -11,12 +11,33 @@ interface DashboardProps {
 export default function DashboardLayout({ children }: DashboardProps) {
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
-
-    const isOpen = async () => {
-
-    }
+    const [sidebar, setSidebar] = useState<boolean>(true);
 
     useEffect(() => {
+        const fetchSidebar = async () => {
+            try {
+                const res = await fetch('/api/cookies/sidebar/')
+                const { data, error } = await res.json();
+
+                if (error){
+                    console.error("ERROR ", error)
+                }
+                
+                console.log("DATA SIDEBAR", data)
+
+                // if (r)
+                // const data = await res.json();
+                setSidebar(data|| null);
+                // const res = await fetch("/api/getUser/")
+                // const data = await res.json();
+                // setUser(data.data.user || null);
+            } catch (error) {
+                console.error("Error fetching user data:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
         // Fetching the user data from the API
         const fetchUser = async () => {
             try {
@@ -76,13 +97,14 @@ export default function DashboardLayout({ children }: DashboardProps) {
             }
         };
 
+        fetchSidebar();
         fetchUser();
     }, []);
 
     // TODO: Create a READ COOKIES API ENDPOINT FOR SIDEBAR PROVIDER OPEN={} 
 
     return <div className="flex flex-row">
-        <SidebarProvider open={false}>
+        <SidebarProvider open={sidebar}>
             <DashboardSidebar user={user} loading={loading} />
             <SidebarTrigger className="-ml-1 mx-2 my-4 px-2" />
             <SidebarInset>
