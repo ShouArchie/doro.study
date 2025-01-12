@@ -10,7 +10,7 @@ import { toast } from "@/hooks/use-toast";
 import { Skeleton } from "./ui/skeleton";
 import { navigate } from "@/actions/redirect";
 import React from "react";
-
+import Link from 'next/link'
 
 interface SidebarProps {
     user: User | null | undefined,
@@ -199,9 +199,11 @@ export default function DashboardSidebar({ user, loading }: SidebarProps) {
                             {!courses?
                             <p>Enroll in some courses!</p>
                             :courses.map((course)=>
+                                <Link href="/search">
                                 <SidebarMenuButton key={course.id}>
                                     {course.code}
                                 </SidebarMenuButton>
+                                </Link>
                             )}
                         </SidebarGroupContent>
                     </DropdownMenu>
