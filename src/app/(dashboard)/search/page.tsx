@@ -306,20 +306,20 @@ export default function SearchPage() {
                                         <div className="flex items-center space-x-2">
                                             <AccordionTrigger className="p-0 h-8 w-8" onClick={(e) => e.stopPropagation()}>
                                             </AccordionTrigger>
-                                            <Button variant="ghost" className="p-0 h-8 w-8">
+                                            <Button variant="ghost" className="p-0 h-8 w-8" onClick={()=>addCourse(result.code, result.id)}>
                                                 <Plus className="h-4 w-4" />
                                             </Button>
                                             <Button
-                                              className="p-0 h-8 w-8"
-                                              variant="ghost"
-                                              onClick={(e) => {
-                                                e.stopPropagation();
-                                                togglePin(result);
-                                              }}
+                                                className="p-0 h-8 w-8"
+                                                variant="ghost"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    togglePin(result);
+                                                }}
                                             >
-                                              <span className="pin-icon transition-transform duration-300">
-                                                {pinnedItems.includes(result.id) ? <PinOff className="h-4 w-4" /> : <Pin className="h-4 w-4" />}
-                                              </span>
+                                                <span className="pin-icon transition-transform duration-300">
+                                                    {pinnedItems.includes(result.id) ? <PinOff className="h-4 w-4" /> : <Pin className="h-4 w-4" />}
+                                                </span>
                                             </Button>
                                         </div>
                                     </div>
