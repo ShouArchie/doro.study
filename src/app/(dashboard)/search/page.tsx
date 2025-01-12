@@ -87,23 +87,29 @@ export default function SearchPage() {
             if (courseElement) {
                 const pinIcon = courseElement.querySelector('.pin-icon') as HTMLElement;
                 const tl = gsap.timeline();
+
+                // Faster initial animation
                 tl.to(courseElement, {
                     backgroundColor: isPinning ? 'rgba(250, 204, 21, 0.2)' : 'transparent',
                     scale: isPinning ? 1.02 : 1,
-                    duration: 0.3,
+                    duration: 0.2,
                     ease: "power2.inOut"
                 });
+
+                // Faster pin icon animation
                 tl.to(pinIcon, {
                     rotate: isPinning ? '45deg' : '0deg',
                     scale: isPinning ? 1.2 : 1,
-                    duration: 0.2,
-                    ease: "back.out(2)"
+                    duration: 0.15,
+                    ease: "back.out(1)"
                 }, "-=0.3");
+
+                // Faster and smoother disappearing animation
                 tl.to(courseElement, {
                     opacity: 0,
-                    y: isPinning ? -20 : 20,
+                    y: isPinning ? -10 : 10,
                     duration: 0.3,
-                    ease: "power2.inOut",
+                    ease: "power2.in",
                     onComplete: () => {
                         setPinnedItems(prevPinned => {
                             if (isPinning) {
@@ -112,22 +118,25 @@ export default function SearchPage() {
                                 return prevPinned.filter(id => id !== course);
                             }
                         });
-                        setTimeout(() => {
-                            applySearch(query);
-                            tl.to(courseElement, {
-                                opacity: 1,
-                                y: 0,
-                                duration: 0.4,
-                                scale: 1,
-                                ease: "power2.out"
-                            });
-                            gsap.to(courseElement, {
-                                backgroundColor: 'transparent',
-                                duration: 0.7,
-                                delay: 0.3,
-                                ease: "power2.out"
-                            });
-                        }, 0);
+
+                        // Immediate state update and re-render
+                        applySearch(query);
+
+                        // Faster reappearing animation
+                        gsap.to(courseElement, {
+                            opacity: 1,
+                            y: 0,
+                            duration: 0.3,
+                            scale: 1,
+                            ease: "power2.out"
+                        });
+
+                        // Faster background color fade
+                        gsap.to(courseElement, {
+                            backgroundColor: 'transparent',
+                            duration: 0.5,
+                            ease: "power2.out"
+                        });
                     }
                 });
             }
@@ -263,9 +272,6 @@ export default function SearchPage() {
                                         </div>
                                         <div className="flex items-center space-x-2">
                                             <AccordionTrigger className="p-0 h-8 w-8" onClick={(e) => e.stopPropagation()}>
-                                                <div className="p-0 h-8 w-8 flex items-center justify-center">
-                                                    <ChevronDown className="h-4 w-4 transition-transform duration-200" />
-                                                </div>
                                             </AccordionTrigger>
                                             <Button variant="ghost" className="p-0 h-8 w-8">
                                                 <Plus className="h-4 w-4" />
