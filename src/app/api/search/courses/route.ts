@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 
 export async function GET(){
     try {
-        const courseQuery =  (await getClient()).from('outlines').select("course_code, course_name, course_description")
+        const courseQuery =  (await getClient()).from('outlines').select("id, course_code, course_name, course_description")
         
         const { data, error } = await courseQuery
 
@@ -18,11 +18,12 @@ export async function GET(){
             return NextResponse.json({ error: "No courses found" }, { status: 404 });
         }
 
+        const ids = data.map(row => row.id);
         const courseCodes = data.map(row => row.course_code);
         const courseNames = data.map(row => row.course_name);
         const courseDescriptions = data.map(row => row.course_description);
 
-        return NextResponse.json({ courseCodes, courseNames, courseDescriptions }, { status: 200 });
+        return NextResponse.json({ ids, courseCodes, courseNames, courseDescriptions }, { status: 200 });
     }
     catch (error) {
         console.error("Internal Server Error");
