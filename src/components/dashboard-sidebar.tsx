@@ -11,6 +11,7 @@ import { Skeleton } from "./ui/skeleton";
 import { navigate } from "@/actions/redirect";
 import React from "react";
 import Link from 'next/link'
+import { redirect } from "next/navigation";
 
 
 interface SidebarProps {
@@ -163,8 +164,9 @@ export default function DashboardSidebar({ user, loading }: SidebarProps) {
     return (
         <Sidebar variant="sidebar" collapsible="icon">
             <SidebarHeader>
-            <SidebarTrigger className="-ml-1 mx-0.5 px-2" />
-                </SidebarHeader> 
+                <SidebarTrigger className="-ml-1 mx-0.5 px-2" />
+            </SidebarHeader>
+
             <SidebarContent>
                 <SidebarGroup>
                     <SidebarMenu>
@@ -180,6 +182,7 @@ export default function DashboardSidebar({ user, loading }: SidebarProps) {
                         ))}
                     </SidebarMenu>
                 </SidebarGroup>
+
                 <SidebarGroup>
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -206,19 +209,17 @@ export default function DashboardSidebar({ user, loading }: SidebarProps) {
                         <SidebarGroupContent>
                             {/* TODO: Load in courses */}
                             {!courses?
-                            <p className="pl-2">Enroll in some courses!</p>
+                            <p className="pl-2 md:invisible">Enroll in some courses!</p>
                             :courses.map((course)=>
-                                <>
-                                <a href="/CS138"/>
                                 <SidebarMenuButton key={course.id}> 
-                                    {course.code}
+                                    <a href={`/course/${course.id}`}>{course.code}</a>
                                 </SidebarMenuButton>
-                                </>
                             )}
                         </SidebarGroupContent>
                     </DropdownMenu>
                 </SidebarGroup>
             </SidebarContent>
+
             <SidebarFooter>
                 <SidebarMenu>
                     <SidebarMenuItem>

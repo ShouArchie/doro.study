@@ -101,7 +101,7 @@ export async function POST(Req:NextRequest){
             return NextResponse.json({ error: error.message }, { status: 400 })
         }
 
-        let res = "";
+        let res = ""; //TODO: Rewrite this
         if (value=="1A"){
             await (await getClient())
                 .from('profiles')

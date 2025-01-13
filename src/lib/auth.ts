@@ -6,8 +6,9 @@ import { Database } from '../../database.types';
 export async function verifyAuth(){
     const cookieStore = await cookies();
     const prefix = 'sb-gtnvcvlloakaqinwtxzb-auth-token.'
+    const loginVerifier = 'sb-gtnvcvlloakaqinwtxzb-auth-token-code-verifier'
 
-    return (cookieStore.has(`${prefix}0`) && cookieStore.has(`${prefix}1`))
+    return (cookieStore.has(`${prefix}0`) || cookieStore.has(`${prefix}1`) || cookieStore.has(`${loginVerifier}`))
 }
 
 export async function getAuth() {
