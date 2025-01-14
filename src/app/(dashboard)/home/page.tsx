@@ -11,45 +11,95 @@ interface GradeUpdate {
   grade: number;
 }
 
+interface JSONData {
+    id: string,
+    code: string,
+}
+
 export default function Dashboard() {
   const [gradeUpdates, setGradeUpdates] = useState<GradeUpdate[]>([]);
-  const [courses, setCourses] = useState<string[]>([]);
+  const [courses, setCourses] = useState<JSONData[] | null>();
   const [visibleCourses, setVisibleCourses] = useState<Record<string, boolean>>({});
   const [isLoading, setIsLoading] = useState(true);
-  const [upcomingSummatives, setUpcomingSummatives] = useState<{date:string, time:string, course:string, type:string}[]>([]);
+  const [upcomingSummatives, setUpcomingSummatives] = useState<{ date: string, time: string, course: string, type: string }[]>([]);
+
+  const fetchCourses = async () => {
+
+  }
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const mockGradeUpdates: GradeUpdate[] = [
-          { date: "01/02/2025", course: "CS 138", grade: 60 },
-          { date: "01/05/2025", course: "CS 138", grade: 65 },
-          { date: "01/10/2025", course: "CS 138", grade: 63 },
-          { date: "01/25/2025", course: "CS 138", grade: 65 },
-          { date: "02/05/2025", course: "CS 138", grade: 68 },
-          { date: "02/13/2025", course: "CS 138", grade: 72 },
-          { date: "02/20/2025", course: "CS 138", grade: 75 },
-          { date: "02/30/2025", course: "CS 138", grade: 83 },
-
-          { date: "01/04/2025", course: "CS 115", grade: 82 },
-          { date: "01/07/2025", course: "CS 115", grade: 88 },
-          { date: "01/21/2025", course: "CS 115", grade: 88 },
-          { date: "02/05/2025", course: "CS 115", grade: 86 },
-          { date: "02/11/2025", course: "CS 115", grade: 90 },
-          { date: "02/25/2025", course: "CS 115", grade: 92 },
-          { date: "02/30/2025", course: "CS 115", grade: 94 },
-          { date: "03/03/2025", course: "CS 115", grade: 99 },
-
-          
+          { date: "01/02/2025", course: "Math", grade: 82 },
+          { date: "01/02/2025", course: "Science", grade: 75 },
+          { date: "01/02/2025", course: "English", grade: 88 },
+          { date: "01/02/2025", course: "History", grade: 80 },
+          { date: "01/02/2025", course: "Art", grade: 90 },
+          { date: "01/02/2025", course: "Engineering", grade: 78 },
+          { date: "01/13/2025", course: "Math", grade: 85 },
+          { date: "01/18/2025", course: "Science", grade: 78 },
+          { date: "01/18/2025", course: "English", grade: 86 },
+          { date: "01/12/2025", course: "History", grade: 82 },
+          { date: "01/18/2025", course: "Art", grade: 92 },
+          { date: "01/18/2025", course: "Engineering", grade: 80 },
+          { date: "02/10/2025", course: "Math", grade: 88 },
+          { date: "02/10/2025", course: "Science", grade: 80 },
+          { date: "02/10/2025", course: "English", grade: 89 },
+          { date: "02/10/2025", course: "History", grade: 85 },
+          { date: "02/10/2025", course: "Art", grade: 91 },
+          { date: "02/10/2025", course: "Engineering", grade: 99 },
+          { date: "02/20/2025", course: "Math", grade: 86 },
+          { date: "02/20/2025", course: "Science", grade: 82 },
+          { date: "02/20/2025", course: "English", grade: 90 },
+          { date: "02/20/2025", course: "History", grade: 83 },
+          { date: "02/20/2025", course: "Art", grade: 93 },
+          { date: "02/20/2025", course: "Engineering", grade: 85 },
+          { date: "03/01/2025", course: "Math", grade: 89 },
+          { date: "03/01/2025", course: "Science", grade: 84 },
+          { date: "03/01/2025", course: "English", grade: 88 },
+          { date: "03/01/2025", course: "History", grade: 86 },
+          { date: "03/01/2025", course: "Art", grade: 92 },
+          { date: "03/01/2025", course: "Engineering", grade: 87 },
+          { date: "03/13/2025", course: "Math", grade: 91 },
+          { date: "03/13/2025", course: "Science", grade: 86 },
+          { date: "03/13/2025", course: "English", grade: 92 },
+          { date: "03/13/2025", course: "History", grade: 88 },
+          { date: "03/13/2025", course: "Art", grade: 94 },
+          { date: "03/13/2025", course: "Engineering", grade: 89 },
+          { date: "03/28/2025", course: "Math", grade: 93 },
+          { date: "03/28/2025", course: "Science", grade: 88 },
+          { date: "03/28/2025", course: "English", grade: 91 },
+          { date: "03/28/2025", course: "History", grade: 90 },
+          { date: "03/28/2025", course: "Art", grade: 95 },
+          { date: "03/28/2025", course: "Engineering", grade: 91 },
+          { date: "04/02/2025", course: "Math", grade: 90 },
+          { date: "04/02/2025", course: "Science", grade: 87 },
+          { date: "04/02/2025", course: "English", grade: 93 },
+          { date: "04/02/2025", course: "History", grade: 89 },
+          { date: "04/02/2025", course: "Art", grade: 96 },
+          { date: "04/02/2025", course: "Engineering", grade: 90 },
+          { date: "04/12/2025", course: "Math", grade: 92 },
+          { date: "04/12/2025", course: "Science", grade: 89 },
+          { date: "04/12/2025", course: "English", grade: 94 },
+          { date: "04/12/2025", course: "History", grade: 91 },
+          { date: "04/12/2025", course: "Art", grade: 97 },
+          { date: "04/12/2025", course: "Engineering", grade: 92 },
+          { date: "04/30/2025", course: "Math", grade: 95 },
+          { date: "04/30/2025", course: "Science", grade: 91 },
+          { date: "04/30/2025", course: "English", grade: 96 },
+          { date: "04/30/2025", course: "History", grade: 93 },
+          { date: "04/30/2025", course: "Art", grade: 98 },
+          { date: "04/30/2025", course: "Engineering", grade: 94 },
         ];
 
         setGradeUpdates(mockGradeUpdates);
         
         const uniqueCourses = Array.from(new Set(mockGradeUpdates.map(update => update.course)));
-        setCourses(uniqueCourses);
+        // setCourses(uniqueCourses);
 
         const initialVisibleCourses = uniqueCourses.reduce((acc, course) => {
-          acc[course] = false;
+          acc[course] = true;
           return acc;
         }, {} as Record<string, boolean>);
         setVisibleCourses(initialVisibleCourses);
@@ -73,7 +123,7 @@ export default function Dashboard() {
         setIsLoading(false);
       }
     };
-
+    fetchCourses();
     fetchData();
   }, []);
 
@@ -88,13 +138,13 @@ export default function Dashboard() {
     <>
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 p-4">
         <div className="lg:col-span-3 h-fit w-full">
-          <GradetimeChart
+          {/* <GradetimeChart
             isLoading={isLoading}
             gradeUpdates={gradeUpdates}
             courses={courses}
             visibleCourses={visibleCourses}
             onToggleCourse={handleToggleCourse}
-          />
+          /> */}
         </div>
         <div className="lg:col-span-1 flex flex-col">
           <div className="lg:row-span-1flex flex-row">
