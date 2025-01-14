@@ -1,8 +1,7 @@
 "use client"
 import { AssignmentsTable } from "@/components/assignments-table";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { ChartConfig, ChartContainer } from "@/components/ui/chart";
+import { ChartConfig } from "@/components/ui/chart";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -10,7 +9,6 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 // import { CourseInfo } from "@/components/course-info"
 
 import { useEffect, useState } from "react";
-import { Label, PolarGrid, PolarRadiusAxis, RadialBar, RadialBarChart } from "recharts";
 
 interface JSONType {
     course_code: string,
@@ -56,10 +54,6 @@ export default function Page({ params }: { params: { id: string } }) {
     const [courseId, setCourseId] = useState<string>()
     const [courseMetadata, setCourseMetadata] = useState<JSONType>();
     const [isLoading, setLoading] = useState<boolean>(true);
-
-    const dynamicChartData = [
-        { label: "Semester Progress", percentage: 100, fill: "hsl(var(--primary))" },
-    ];
 
     const dynamicChartConfig = {
         percentage: {
@@ -177,75 +171,6 @@ export default function Page({ params }: { params: { id: string } }) {
                         </div>
                     </>
                 }
-            </div>
-            <div className="col-span-1 flex flex-col gap-2">
-                <Card className="w-full flex flex-col h-fit">
-                    <CardHeader className="text-center">
-                        <CardTitle>
-                            {isLoading ?
-                                <Skeleton className="h-5 w-1/3" />
-                                : <>Semester Progress</>
-                            }
-                        </CardTitle>
-                        <CardDescription>
-                            Semester
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent className="flex-grow flex items-center justify-center">
-                        <ChartContainer
-                            config={dynamicChartConfig}
-                            className="w-full h-full"
-                        >
-                            <RadialBarChart
-                                data={dynamicChartData}
-                                startAngle={90}
-                                endAngle={360 * 80/ 100 + 90}
-                                innerRadius={65}
-                                outerRadius={82.5}
-                            >
-                                <PolarGrid
-                                    gridType="circle"
-                                    radialLines={false}
-                                    stroke="none"
-                                    className="first:fill-muted last:fill-background"
-                                    polarRadius={[69, 61]}
-                                />
-                                <RadialBar dataKey="percentage" background cornerRadius={10} />
-                                <PolarRadiusAxis tick={false} tickLine={false} axisLine={false}>
-                                    <Label
-                                        content={({ viewBox }) => {
-                                            if (viewBox && "cx" in viewBox && "cy" in viewBox) {
-                                                return (
-                                                    <g>
-                                                        <text
-                                                            x={viewBox.cx}
-                                                            y={viewBox.cy}
-                                                            textAnchor="middle"
-                                                            dominantBaseline="central"
-                                                            className="fill-foreground text-3xl font-bold"
-                                                        >
-                                                            {80}%
-                                                        </text>
-                                                    </g>
-                                                );
-                                            }
-                                        }}
-                                    />
-                                </PolarRadiusAxis>
-                            </RadialBarChart>
-                        </ChartContainer>
-                    </CardContent>
-                    <CardFooter className="flex-col gap-2 text-sm text-center">
-                        <div className="flex items-center justify-center gap-2 font-medium leading-none">
-                            {/* {semesterProgress < 50 ? 'Just getting started!' : 'Over halfway there!'} <TrendingUp className="h-4 w-4" /> */}
-                            Testing
-                        </div>
-                        <div className="leading-none text-muted-foreground mb-3">
-                            {/* {semester} semester: {dates.start.toLocaleDateString()} - {dates.end.toLocaleDateString()} */}
-                            Testing
-                        </div>
-                    </CardFooter>
-                </Card>
             </div>
         </div>
         // <div className="container py-10 min-h-screen">
