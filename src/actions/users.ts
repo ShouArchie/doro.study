@@ -7,7 +7,7 @@ export const loginAction = async (provider: Provider) => {
         const { data, error } = await (await getAuth()).signInWithOAuth({
             provider,
             options: {
-                redirectTo: (process.env.NODE_ENV==="production")?`http://doro.study/home`:'http://localhost:3000/home'
+                redirectTo: (process.env.NODE_ENV==="production")?`http://doro.study/api/auth/`:'http://localhost:3000/api/auth/'
             }
         });
 

@@ -13,7 +13,6 @@ import React from "react";
 import Link from 'next/link'
 import { redirect } from "next/navigation";
 
-
 interface SidebarProps {
     user: User | null | undefined,
     loading: boolean,

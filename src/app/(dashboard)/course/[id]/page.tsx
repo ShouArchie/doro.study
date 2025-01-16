@@ -49,7 +49,7 @@ interface schemes {
 }
 
 
-export default function Page({ params }: { params: { id: string } }) {
+export default function Page({ params }: { params: Promise<{ id: string }> }) {
     // const courseId = params.id
     const [courseId, setCourseId] = useState<string>()
     const [courseMetadata, setCourseMetadata] = useState<JSONType>();
@@ -68,7 +68,7 @@ export default function Page({ params }: { params: { id: string } }) {
     useEffect(()=>{
 
         const fetchCourseData = async () => {
-            const value = (await params).id
+            const value = await (await params).id
             setCourseId(value)
 
             const payload = {

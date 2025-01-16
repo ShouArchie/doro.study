@@ -2,7 +2,7 @@
 import DashboardSidebar from "@/components/dashboard-sidebar";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { User } from "@supabase/supabase-js";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface DashboardProps {
     children: React.ReactNode,
@@ -76,7 +76,6 @@ export default function DashboardLayout({ children }: DashboardProps) {
     }, []);
 
     // TODO: Create a READ COOKIES API ENDPOINT FOR SIDEBAR PROVIDER OPEN={} 
-
     return <div className="flex flex-row overflow-x-hidden">
         <SidebarProvider>
             <DashboardSidebar user={user} loading={loading} />
