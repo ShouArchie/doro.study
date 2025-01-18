@@ -78,7 +78,7 @@ export default function DashboardLayout({ children }: DashboardProps) {
 
                     setUser(metadata.data.user || null);
                 } else {
-                    console.log("DATA EXISTS PULL DATA", data.message)
+                    console.log("DATA EXISTS PULL DATA", data)
                 }
                 
 

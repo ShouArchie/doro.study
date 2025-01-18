@@ -14,6 +14,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion"
+import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 
 const faculties = [
     { title: "Engineering", index: 0 },
@@ -231,115 +232,133 @@ export default function SearchPage() {
     }, [pinnedItems, query, courses]);
 
     return (
-        <div className="w-full">
-            <div className="w-full py-3 flex items-center justify-center">
-                <div className="search w-4">
-                    <Input value={query.toUpperCase()} onChange={handleSearch} placeholder="Search" leadingIcon={<Search className="h-4" />} />
+        <Pagination>
+            <div className="w-full">
+                <div className="w-full py-3 flex items-center justify-center">
+                    <div className="search w-4">
+                        <Input value={query.toUpperCase()} onChange={handleSearch} placeholder="Search" leadingIcon={<Search className="h-4" />} />
+                    </div>
                 </div>
-            </div>
-            <div className="w-full flex items-center justify-center py-1 mx-10 gap-4">
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild className="faculty opacity-0">
-                        <Button variant="outline">
-                            {faculty}
-                            <ChevronDown />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                        <DropdownMenuRadioGroup value={faculties[facultyIndex].title}>
-                            {faculties.map((facultyOption) => (
-                                <DropdownMenuRadioItem
-                                    key={facultyOption.index}
-                                    value={facultyOption.title}
-                                    onSelect={() => {setFacultyIndex(facultyOption.index); setFaculty(facultyOption.title)}}
-                                >
-                                    {facultyOption.title}
-                                </DropdownMenuRadioItem>
-                            ))}
-                        </DropdownMenuRadioGroup>
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                <div className="w-full flex items-center justify-center py-1 mx-10 gap-4">
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild className="faculty opacity-0">
+                            <Button variant="outline">
+                                {faculty}
+                                <ChevronDown />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                            <DropdownMenuRadioGroup value={faculties[facultyIndex].title}>
+                                {faculties.map((facultyOption) => (
+                                    <DropdownMenuRadioItem
+                                        key={facultyOption.index}
+                                        value={facultyOption.title}
+                                        onSelect={() => { setFacultyIndex(facultyOption.index); setFaculty(facultyOption.title) }}
+                                    >
+                                        {facultyOption.title}
+                                    </DropdownMenuRadioItem>
+                                ))}
+                            </DropdownMenuRadioGroup>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
 
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild className="department opacity-0">
-                        <Button variant="outline">
-                            {dept}
-                            <ChevronDown />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                        <DropdownMenuRadioGroup value={dept} onValueChange={setDept}>
-                            {departments[facultyIndex].map((departmentOption) => (
-                                <DropdownMenuRadioItem key={departmentOption} value={departmentOption}>
-                                    {departmentOption}
-                                </DropdownMenuRadioItem>
-                            ))}
-                        </DropdownMenuRadioGroup>
-                    </DropdownMenuContent>
-                </DropdownMenu>
-            </div>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild className="department opacity-0">
+                            <Button variant="outline">
+                                {dept}
+                                <ChevronDown />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                            <DropdownMenuRadioGroup value={dept} onValueChange={setDept}>
+                                {departments[facultyIndex].map((departmentOption) => (
+                                    <DropdownMenuRadioItem key={departmentOption} value={departmentOption}>
+                                        {departmentOption}
+                                    </DropdownMenuRadioItem>
+                                ))}
+                            </DropdownMenuRadioGroup>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </div>
 
-            <ScrollArea className="m-3">
-                <div ref={resultsRef} className="max-h-[84vh]">
-                    {isLoading ? (
-                        Array.from({ length: 10 }, (_, index) => (
-                            <div key={index} className="flex items-center space-x-4 rounded-md border p-4 mb-3 h-[90px]">
-                                <div className="flex-1 space-y-1">
-                                    <Skeleton className="h-4 w-[5rem] pb-1 leading-none" />
-                                    <Skeleton className="h-3 w-1/12" />
-                                </div>
-                                <Button variant="ghost" className="p-0">
-                                    <Plus />
-                                </Button>
-                                <Button className="p-0" variant="ghost">
-                                    <Pin />
-                                </Button>
-                            </div>
-                        ))
-                    ) : (
-                        <Accordion type="single" collapsible className="w-full">
-                            {results.map((result) => (
-                                <AccordionItem key={result.id} value={result.id} className="border rounded-md mb-3 overflow-hidden">
-                                    <div data-course={result.id} className="flex items-center space-x-4 p-4">
+                    <ScrollArea className="m-3">
+                        <div ref={resultsRef} className="max-h-[84vh]">
+                            {isLoading ? (
+                                Array.from({ length: 10 }, (_, index) => (
+                                    <div key={index} className="flex items-center space-x-4 rounded-md border p-4 mb-3">
                                         <div className="flex-1 space-y-1">
-                                            <p className="text-sm font-medium leading-none">
-                                                {result.code}
-                                            </p>
-                                            <p className="text-sm text-muted-foreground">
-                                                {result.name}
-                                            </p>
+                                            <Skeleton className="h-4 w-[5rem] pb-1 leading-none" />
+                                            <Skeleton className="h-3 w-1/12" />
                                         </div>
-                                        <div className="flex items-center space-x-2">
-                                            <AccordionTrigger className="p-0 h-8 w-8" onClick={(e) => e.stopPropagation()}>
-                                            </AccordionTrigger>
-                                            <Button variant="ghost" className="p-0 h-8 w-8" onClick={()=>addCourse(result.code, result.id)}>
-                                                <Plus className="h-4 w-4" />
-                                            </Button>
-                                            <Button
-                                                className="p-0 h-8 w-8"
-                                                variant="ghost"
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    togglePin(result);
-                                                }}
-                                            >
-                                                <span className="pin-icon transition-transform duration-300">
-                                                    {pinnedItems.includes(result.id) ? <PinOff className="h-4 w-4" /> : <Pin className="h-4 w-4" />}
-                                                </span>
-                                            </Button>
-                                        </div>
+                                        <Button variant="ghost" className="p-0">
+                                            <Plus />
+                                        </Button>
+                                        <Button className="p-0" variant="ghost">
+                                            <Pin />
+                                        </Button>
                                     </div>
-                                    <AccordionContent>
-                                        <div className="px-4 pb-0">
-                                            <p className="text-sm text-muted-foreground">{result.description}</p>
-                                        </div>
-                                    </AccordionContent>
-                                </AccordionItem>
-                            ))}
-                        </Accordion>
-                    )}
-                </div>
-            </ScrollArea>
-        </div>
+                                ))
+                            ) : (
+                                <Accordion type="single" collapsible className="w-full">
+                                    {results.map((result) => (
+                                        <AccordionItem key={result.id} value={result.id} className="border rounded-md mb-3 overflow-hidden">
+                                            <div data-course={result.id} className="flex items-center space-x-4 p-4">
+                                                <div className="flex-1 space-y-1">
+                                                    <p className="text-sm font-medium leading-none">
+                                                        {result.code}
+                                                    </p>
+                                                    <p className="text-sm text-muted-foreground">
+                                                        {result.name}
+                                                    </p>
+                                                </div>
+                                                <div className="flex items-center space-x-2">
+                                                    <AccordionTrigger className="p-0 h-8 w-8" onClick={(e) => e.stopPropagation()}>
+                                                    </AccordionTrigger>
+                                                    <Button variant="ghost" className="p-0 h-8 w-8" onClick={() => addCourse(result.code, result.id)}>
+                                                        <Plus className="h-4 w-4" />
+                                                    </Button>
+                                                    <Button
+                                                        className="p-0 h-8 w-8"
+                                                        variant="ghost"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            togglePin(result);
+                                                        }}
+                                                    >
+                                                        <span className="pin-icon transition-transform duration-300">
+                                                            {pinnedItems.includes(result.id) ? <PinOff className="h-4 w-4" /> : <Pin className="h-4 w-4" />}
+                                                        </span>
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                            <AccordionContent>
+                                                <div className="px-4 pb-0">
+                                                    <p className="text-sm text-muted-foreground">{result.description}</p>
+                                                </div>
+                                            </AccordionContent>
+                                        </AccordionItem>
+                                    ))}
+                                </Accordion>
+                            )}
+                        </div>
+                    </ScrollArea>
+
+                <PaginationContent className="w-full flex flex-row justify-center items-center">
+                    {/* PAGINATION */}
+                    <PaginationItem>
+                        <PaginationPrevious href="#" />
+                    </PaginationItem>
+                    <PaginationItem>
+                        <PaginationLink href="#">1</PaginationLink>
+                    </PaginationItem>
+                    <PaginationItem>
+                        <PaginationEllipsis/>
+                    </PaginationItem>
+                    <PaginationItem>
+                        <PaginationNext href="#" />
+                    </PaginationItem>
+                </PaginationContent>
+            </div>
+        </Pagination>
     );
 }

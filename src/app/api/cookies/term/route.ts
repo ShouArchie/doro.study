@@ -3,6 +3,11 @@ import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
     try {
+        interface TermData {
+            title: string,
+            index: number
+        }
+
         const { value: term } = await req.json()
 
         // Validate input

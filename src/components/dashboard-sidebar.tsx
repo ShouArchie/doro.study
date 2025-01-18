@@ -8,10 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { logoutAction } from "@/actions/users";
 import { toast } from "@/hooks/use-toast";
 import { Skeleton } from "./ui/skeleton";
-import { navigate } from "@/actions/redirect";
 import React from "react";
-import Link from 'next/link'
-import { redirect } from "next/navigation";
 
 interface SidebarProps {
     user: User | null | undefined,
@@ -21,6 +18,10 @@ interface SidebarProps {
 interface JSONData {
     id: string,
     code: string,
+}
+
+interface Terms {
+    [key: number]: JSONData[]
 }
 
 const items = [
@@ -36,20 +37,50 @@ const items = [
     },
 ]
 
-const terms = [
-    "1A",
-    "1B",
-    "2A",
-    "2B",
-    "3A",
-    "3B",
-    "4A",
-    "4B"
+interface TermData {
+    title: string,
+    index: number
+}
+
+const terms: TermData[] = [
+    { 
+        title: "1A",
+        index: 0 
+    },
+    {
+        title: "1B",
+        index: 1
+    },
+    {
+        title: "2A",
+        index: 2
+    },
+    {
+        title: "2B",
+        index: 3
+    },
+    {
+        title: "3A",
+        index: 4
+    },
+    {
+        title: "3B",
+        index: 5
+    },
+    {
+        title: "4A",
+        index: 6
+    },
+    {
+        title: "4B",
+        index: 7
+    },
 ]
 
 export default function DashboardSidebar({ user, loading }: SidebarProps) {
     const [term, setTerm] = useState("")
-    const [courses, setCourses] = useState<JSONData[] | null>()
+    const [termIndex, setTermIndex] = useState<number>(0);
+    const [courses, setCourses] = useState<Terms>()
     const [isPending, startTransition] = useTransition();
 
     const fetchCourses = async () => {
@@ -63,7 +94,11 @@ export default function DashboardSidebar({ user, loading }: SidebarProps) {
                 return;
             }
 
-            setCourses(data)
+            console.log("COURSES DATA:", data[0])
+
+            const parsedData = JSON.parse(data)
+
+            setCourses(parsedData)
         } catch (error) {
             console.error("Error updating courses:", error);
         } finally {
@@ -71,11 +106,11 @@ export default function DashboardSidebar({ user, loading }: SidebarProps) {
         }
     };
 
-    const storeTerm = async (term: string) => {
+    const storeTerm = async (term: TermData) => {
         try {
             // GET Request
             const payload = {
-                value: term
+                value: JSON.stringify(term)
             }
 
             const response = await fetch('/api/cookies/term/', {
@@ -89,11 +124,12 @@ export default function DashboardSidebar({ user, loading }: SidebarProps) {
             const { data, error } = await response.json();
 
             if (error) {
-                console.error("Error fetching term:", error);
+                console.error("Error setting term:", error);
                 return;
             }
 
-            setTerm(term)
+            setTerm(term.title)
+            setTermIndex(term.index)
         } catch (error) {
             console.error("Error updating term:", error);
         } finally {
@@ -105,9 +141,8 @@ export default function DashboardSidebar({ user, loading }: SidebarProps) {
         fetchCourses()
     }
 
-    const handleSelect = (term: string) => {
+    const handleSelect = (term: TermData) => {
         storeTerm(term)
-        fetchCourses()
     }
 
     const handleLoading = () => {
@@ -147,7 +182,15 @@ export default function DashboardSidebar({ user, loading }: SidebarProps) {
                     return;
                 }
 
-                setTerm(data);
+                if (!data){
+                    console.error("No term data returned (client side)", data)
+                    return;
+                }
+
+                const parsedData = JSON.parse(data)
+
+                setTerm(parsedData.title);
+                setTermIndex(parsedData.index);
             } catch (error) {
                 console.error("Error updating term:", error);
             } finally {
@@ -172,7 +215,7 @@ export default function DashboardSidebar({ user, loading }: SidebarProps) {
                         {items.map((item) => (
                             <SidebarMenuItem key={item.title}>
                                 <SidebarMenuButton asChild>
-                                    <a href={item.url}>
+                                    <a href={`http://localhost:3000/${item.url}`}>
                                         < item.icon />
                                         <span>{item.title}</span>
                                     </a>
@@ -183,39 +226,45 @@ export default function DashboardSidebar({ user, loading }: SidebarProps) {
                 </SidebarGroup>
 
                 <SidebarGroup>
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <SidebarMenuButton>
-                                { loading ?  
-                                    <Skeleton className="h-4 w-[30px]" />
-                                    : <SidebarGroupLabel>{term}</SidebarGroupLabel>
-                                }
-                                <div className="
+                    <SidebarMenu>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <SidebarMenuButton>
+                                    {loading ?
+                                        <Skeleton className="h-4 w-[30px]" />
+                                        : <SidebarGroupLabel>{term}</SidebarGroupLabel>
+                                    }
+                                    <div className="
                                         absolute right-3 top-3.5 flex aspect-square w-5 items-center justify-center rounded-md p-0 text-sidebar-foreground outline-none ring-sidebar-ring transition-transform hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0
                                         after:absolute after:-inset-2 after:md:hidden,
                                         group-data-[collapsible=icon]">
-                                    <ChevronDown /> <span className="sr-only">Select Term</span>
-                                </div>
-                            </SidebarMenuButton>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent side="bottom" className="w-[--radix--popper-anchor-width]">
-                            {terms.map((term) => (
-                                <DropdownMenuItem key={term} onSelect={()=>handleSelect(term)}>
-                                    <span>{term}</span>
-                                </DropdownMenuItem>
-                            ))}
-                        </DropdownMenuContent>
-                        <SidebarGroupContent>
-                            {/* TODO: Load in courses */}
-                            {!courses?
-                            <p className="pl-2 md:invisible">Enroll in some courses!</p>
-                            :courses.map((course)=>
-                                <SidebarMenuButton key={course.id}> 
-                                    <a href={`/course/${course.id}`}>{course.code}</a>
+                                        <ChevronDown /> <span className="sr-only">Select Term</span>
+                                    </div>
                                 </SidebarMenuButton>
-                            )}
-                        </SidebarGroupContent>
-                    </DropdownMenu>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent side="bottom" className="w-[--radix--popper-anchor-width]">
+                                {terms.map((term) => (
+                                    <DropdownMenuItem key={term.index} onSelect={() => handleSelect(term)}>
+                                        <span>{term.title}</span>
+                                    </DropdownMenuItem>
+                                ))}
+                            </DropdownMenuContent>
+                            <SidebarGroupContent>
+                                {!courses ?
+                                    <p className="pl-2 md:invisible">Enroll in some courses!</p>
+                                    : courses[termIndex].map((course) =>
+                                        <a key={course.id} href={`/course/${course.id}`}>
+                                            {<SidebarMenuButton>
+                                                <span>{course.code}</span>
+                                            </SidebarMenuButton>}
+                                        </a>
+                                    )}
+                                {/* :
+                            <p>{courses.toString()}</p>
+                            } */}
+                            </SidebarGroupContent>
+                        </DropdownMenu>
+                    </SidebarMenu>
                 </SidebarGroup>
             </SidebarContent>
 

@@ -5,90 +5,61 @@ import { NextResponse } from "next/server";
 export async function GET(){
     const cookieStore = await cookies()
 
-    if (!cookieStore.has('user_metadata') || !cookieStore.has('term')){
-        console.error("User doens't have metadata / Term data is not stored")
-        return NextResponse.json({ error: "User doesn't have metadata / Term data is not stored" }, { status: 404 })
-    }
-
-    const metadata = cookieStore.get('user_metadata')
-    const term = cookieStore.get('term')
-
-    const formatted_metadata = JSON.parse(metadata!.value)
-    const value = term!.value
-
-    let data, termData;
-
-    if (value=="1A"){
-        data = await (await getClient())
-            .from('profiles')
-            .select("1A")
-            .eq('id', formatted_metadata.id)
-        
-        termData = data!.data![0]["1A"]
-    } else if (value=="1B"){
-        data = await (await getClient())
-            .from('profiles')
-            .select("1B")
-            .eq('id', formatted_metadata.id)
-
-        termData = data!.data![0]["1B"]
-    } else if (value=="2A"){
-        data = await (await getClient())
-            .from('profiles')
-            .select("2A")
-            .eq('id', formatted_metadata.id)
-        
-        termData = data!.data![0]["2A"]
-    } else if (value=="2B"){
-        data = await (await getClient())
-            .from('profiles')
-            .select("2B")
-            .eq('id', formatted_metadata.id)
-        
-        termData = data!.data![0]["2B"]
-    } else if (value=="3A"){
-        data = await (await getClient())
-            .from('profiles')
-            .select("3A")
-            .eq('id', formatted_metadata.id)
-
-        termData = data!.data![0]["3A"]
-    } else if (value=="3B"){
-        data = await (await getClient())
-            .from('profiles')
-            .select("3B")
-            .eq('id', formatted_metadata.id)
-        
-        termData = data!.data![0]["3B"]
-    } else if (value=="4A"){
-        data = await (await getClient())
-            .from('profiles')
-            .select("4A")
-            .eq('id', formatted_metadata.id)
-        
-        termData = data!.data![0]["4A"]
-    } else if (value=="4B") {
-        data = await (await getClient())
-            .from('profiles')
-            .select("4B")
-            .eq('id', formatted_metadata.id)
-
-        termData = data!.data![0]["4B"]
-    }
-
-    if (!data){
-        console.error("No data returned")
-        return NextResponse.json({message: "No data returned"}, {status: 404})
-    }
-
-    if (data.error){
-        console.error("ERROR: ", data.error.message)
-        return NextResponse.json({message: data.error.message}, {status: 400})
-    }
-
-    if (!termData){
-        return NextResponse.json({data: null}, {status: 200})
+    if (!cookieStore.has('user_metadata')){
+        console.error("User doesn't have metadata")
+        return NextResponse.json({ error: "User doesn't have metadata" }, { status: 404 })
     }
     
-    return NextResponse.json({data: termData}, {status: 200})
+    if (!cookieStore.has('courses')){
+        console.log("No course information available")
+
+        //Run POST METHOD
+        const metadata = cookieStore.get('user_metadata')
+        const formatted_metadata = JSON.parse(metadata!.value)
+
+        const terms: string[] = ["1A", "1B", "2A", "2B", "3A", "3B", "4A", "4B"]
+
+        let courses = []
+
+        for (const term of terms) {
+            const data = await (await getClient())
+                .from('profiles')
+                .select(term)
+                .eq('id', formatted_metadata.id)
+
+            // console.log(term, data, data.error)
+            //TODO: Fix typescript error
+            const termData = data!.data![0][term]
+
+            if (data.error) {
+                console.error("ERROR: ", data.error.message)
+                return NextResponse.json({ message: data.error.message }, { status: 400 })
+            }
+
+            if (!data) {
+                console.error("No data returned")
+                return NextResponse.json({ message: "No data returned" }, { status: 404 })
+            }
+
+            courses.push((termData)??[])
+        }
+
+        const coursesString = JSON.stringify(courses);
+
+        cookieStore.set('courses', coursesString)
+
+        return NextResponse.json({ data: coursesString }, { status: 200 })
+
+    } else {
+        console.log("Courses cached in cookies")
+
+        const value = cookieStore.get('courses')
+
+        if (!value){
+            console.error("Internal Server Error")
+            return NextResponse.json({ message: "Internal Server Error" }, { status: 500 })
+        }
+
+        return NextResponse.json({ data: value.value }, { status: 200 })
+    }
 }

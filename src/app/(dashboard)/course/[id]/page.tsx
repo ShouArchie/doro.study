@@ -48,7 +48,6 @@ interface schemes {
     assessments: assessment[],
 }
 
-
 export default function Page({ params }: { params: Promise<{ id: string }> }) {
     // const courseId = params.id
     const [courseId, setCourseId] = useState<string>()
@@ -68,7 +67,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
     useEffect(()=>{
 
         const fetchCourseData = async () => {
-            const value = await (await params).id
+            const value = (await params).id
             setCourseId(value)
 
             const payload = {
@@ -131,7 +130,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {courseMetadata!.schemes[0].assessments.map((assessment,index) => 
+                                {courseMetadata!.schemes[0].assessments?.map((assessment) => 
                                 Array.from({length: assessment.count}).map((_, i) => (
                                     <TableRow key={assessment.assessmentType+i}>
                                         <TableCell className="font-medium text-white">
@@ -144,12 +143,18 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
                                                 </>
                                             }
                                         </TableCell>
+
+                                        {/* Date */}
                                         <TableCell className="text-gray-300">
                                             {(assessment.date[0]=="none") ? "N/A": assessment.date}
                                         </TableCell>
+
+                                        {/* Weighting */}
                                         <TableCell className="text-right text-gray-300">
-                                            {(100*assessment.weight)/(assessment.count)}
+                                            {((100*assessment.weight)/(assessment.count)).toPrecision(2)}
                                         </TableCell>
+
+                                        {/* Grade Input */}
                                         <TableCell className="text-right">
                                             <Input
                                                 type="text"

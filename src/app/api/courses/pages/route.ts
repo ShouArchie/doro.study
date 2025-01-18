@@ -16,8 +16,8 @@ export async function POST(Req: NextRequest){
         //Cache data since class weights, prof, etc, is saved
         const cookieStore = await cookies()
 
-        if (cookieStore.has('courses')){
-            const value = cookieStore.get('courses')
+        if (cookieStore.has('course_pages')){
+            const value = cookieStore.get('course_pages')
             courseData = JSON.parse(value!.value)
 
             console.log("ID DATA:", id.id)
@@ -46,16 +46,16 @@ export async function POST(Req: NextRequest){
             return NextResponse.json({error: "No data found"}, {status: 404})
         }
 
-        if (!cookieStore.has('courses')){
+        if (!cookieStore.has('course_pages')){
             courseData = []
         }
 
         courseData.push(data)
 
-        cookieStore.set('courses', JSON.stringify(courseData))
+        cookieStore.set('course_pages', JSON.stringify(courseData))
 
         console.log("Successfully returned course metadata")
-        return NextResponse.json({data: data}, {status: 200})
+        return NextResponse.json({data: data[0]}, {status: 200})
     } catch (error) {
         console.error("Internal Server Error")
         return NextResponse.json({error: "Internal Server Error"}, {status: 500})

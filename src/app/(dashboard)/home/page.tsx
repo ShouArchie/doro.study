@@ -16,16 +16,40 @@ interface JSONData {
     code: string,
 }
 
+interface Terms {
+  [key: number] : JSONData[]
+}
+
 export default function Dashboard() {
   const [gradeUpdates, setGradeUpdates] = useState<GradeUpdate[]>([]);
-  const [courses, setCourses] = useState<JSONData[] | null>();
+  const [courses, setCourses] = useState<Terms>();
   const [visibleCourses, setVisibleCourses] = useState<Record<string, boolean>>({});
   const [isLoading, setIsLoading] = useState(true);
   const [upcomingSummatives, setUpcomingSummatives] = useState<{ date: string, time: string, course: string, type: string }[]>([]);
 
-  const fetchCourses = async () => {
+    const fetchCourses = async () => {
+        try {
+            // GET Request
+            const response = await fetch('/api/cookies/courses')
+            const { data, error } = await response.json();
 
-  }
+            if (error) {
+                console.error("Error fetching courses:", error);
+                return;
+            }
+
+            console.log("COURSES DATA:", data[0])
+
+            const parsedData = JSON.parse(data)
+
+            setCourses(parsedData)
+            setIsLoading(false);
+        } catch (error) {
+            console.error("Error updating courses:", error);
+        } finally {
+            console.log("COURSE FETCH COMPLETED");
+        }
+    };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -117,10 +141,10 @@ export default function Dashboard() {
         ];
         setUpcomingSummatives(mockSummatives);
 
-        setIsLoading(false);
+        // setIsLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error);
-        setIsLoading(false);
+        // setIsLoading(false);
       }
     };
     fetchCourses();
@@ -138,24 +162,30 @@ export default function Dashboard() {
     <>
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 p-4">
         <div className="lg:col-span-3 h-fit w-full">
-          {/* <GradetimeChart
+          {isLoading? <p>Loading...</p>
+          :<GradetimeChart
             isLoading={isLoading}
             gradeUpdates={gradeUpdates}
-            courses={courses}
+            courses={Object.values(courses!).map((term:JSONData[])=>term!.map((course)=>course.code)).filter((term)=>(term!==null)).flat()}
             visibleCourses={visibleCourses}
             onToggleCourse={handleToggleCourse}
-          /> */}
+          />}
         </div>
         <div className="lg:col-span-1 flex flex-col">
           <div className="lg:row-span-1flex flex-row">
             <div className="mb-4 h-full">
-              <YearProgressChart isLoading={isLoading}/>
+              <YearProgressChart 
+                isLoading={isLoading}
+              />
             </div>
           </div>
         </div>
       </div>
       <div className="m-4">
-        <UpcomingSummativesTable summatives={upcomingSummatives} isLoading={isLoading} />
+        <UpcomingSummativesTable 
+          summatives={upcomingSummatives} 
+          isLoading={isLoading}
+        />
       </div>
     </>
   );

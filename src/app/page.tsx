@@ -46,9 +46,9 @@ export default function Page() {
   }, [nextImage])
 
   return (
-    <div className="flex h-screen bg-background text-foreground">
+    <div className="flex flex-col md:flex-row grid-cols-2 md:grid-cols-1 h-screen bg-background text-foreground">
       {/* Left side with carousel */}
-      <div className="w-1/2 relative overflow-hidden">
+      <div className="w-full h-full col-span-1 relative overflow-hidden">
         {carouselImages.map((image, index) => (
           <div
             key={index}
@@ -76,10 +76,10 @@ export default function Page() {
       </div>
 
       {/* Right side with features, animated quote and button */}
-      <div className="w-1/2 flex flex-col items-center justify-start p-8">
+      <div className="w-full h-full flex flex-col justify-between col-span-1 items-center p-8">
         {/* Features Section */}
+        <h2 className="w-full text-3xl font-bold text-center mb-8 uppercase">DORO.STUDY</h2>
         <div className="w-full">
-          <h2 className="text-3xl font-bold text-center mb-8 uppercase">DORO.STUDY</h2>
           <div className="grid grid-cols-1 gap-8">
             <div className="flex items-start">
               <Zap className="w-8 h-8 mr-4 text-primary" />
@@ -111,31 +111,29 @@ export default function Page() {
             </div>
           </div>
         </div>
-        <div className="mt-auto">
-          <div className="h-[100px] flex items-center">
-            <AnimatePresence mode="wait">
-              <motion.p
-                key={currentQuote}
-                className="text-xl text-center"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.5 }}
-              >
-                {quotes[currentQuote]}
-              </motion.p>
-            </AnimatePresence>
-          </div>
-          <div className="mt-4 flex justify-center">
-            <Link href="/login">
-              <Button size="lg" className="text-lg px-8">
-                Start Now
-              </Button>
-            </Link>
-          </div>
+        <div className="h-[100px] flex items-center">
+          <AnimatePresence mode="wait">
+            <motion.p
+              key={currentQuote}
+              className="text-xl md:text-sm text-center"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.5 }}
+            >
+              {quotes[currentQuote]}
+            </motion.p>
+          </AnimatePresence>
+        </div>
+        <div className="mt-4 flex justify-center">
+          <Link href="/login">
+            <Button size="lg" className="text-lg px-8">
+              Start Now
+            </Button>
+          </Link>
         </div>
       </div>
     </div>
-  )
+  );
 }
 

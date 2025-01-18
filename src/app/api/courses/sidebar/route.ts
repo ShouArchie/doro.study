@@ -19,7 +19,6 @@ export async function GET(){
         const index = 0;
 
         if (cookieStore.has('selected_courses')) {
-
             const term = cookieStore.get('term')
 
             if (term) {
@@ -38,9 +37,13 @@ export async function GET(){
                 value: JSON.stringify({ term: index, course: cookieStore.get('selected_courses') })
             }
 
+            console.log("Courses data returned successfully")
             return NextResponse.json({ data: payload }, { status: 200 })
+        } else {
+
         }
 
+        console.log("No courses data returned")
         return NextResponse.json({data: null}, {status: 201})
 
     } catch (error) {
@@ -101,46 +104,10 @@ export async function POST(Req:NextRequest){
             return NextResponse.json({ error: error.message }, { status: 400 })
         }
 
-        let res = ""; //TODO: Rewrite this
-        if (value=="1A"){
+        if (value in ["1A", "1B", "2A", "2B", "3A", "3B", "4A", "4B"]){
             await (await getClient())
                 .from('profiles')
-                .update({"1A": courseArray})
-                .eq('id', formatted_metadata.id);
-        } else if (value=="1B"){
-            await (await getClient())
-                .from('profiles')
-                .update({"1B": courseArray})
-                .eq('id', formatted_metadata.id);
-        } else if (value=="2A"){
-            await (await getClient())
-                .from('profiles')
-                .update({"2A": courseArray})
-                .eq('id', formatted_metadata.id);
-        } else if (value=="2B"){
-            await (await getClient())
-                .from('profiles')
-                .update({"2B": courseArray})
-                .eq('id', formatted_metadata.id);
-        } else if (value=="3A"){
-            await (await getClient())
-                .from('profiles')
-                .update({"3A": courseArray})
-                .eq('id', formatted_metadata.id);
-        } else if (value=="3B"){
-            await (await getClient())
-                .from('profiles')
-                .update({"3B": courseArray})
-                .eq('id', formatted_metadata.id);
-        } else if (value=="4A"){
-            await (await getClient())
-                .from('profiles')
-                .update({"4A": courseArray})
-                .eq('id', formatted_metadata.id);
-        } else if (value=="4B"){
-            await (await getClient())
-                .from('profiles')
-                .update({"4B": courseArray})
+                .update({ [value] : courseArray })
                 .eq('id', formatted_metadata.id);
         }
 
@@ -151,6 +118,8 @@ export async function POST(Req:NextRequest){
             sameSite: 'strict',
             // maxAge: 60 * 60 * 24 * 7 // 1 week
         })
+
+        
 
         return NextResponse.json(
             { message: "Course successfully added" },

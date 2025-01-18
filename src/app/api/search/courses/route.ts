@@ -3,7 +3,10 @@ import { NextResponse } from "next/server";
 
 export async function GET(){
     try {
-        const courseQuery =  (await getClient()).from('outlines').select("id, course_code, course_name, course_description")
+        const courseQuery =  (await getClient())
+            .from('outlines')
+            .select("id, course_code, course_name, course_description")
+            .limit(10)
         
         const { data, error } = await courseQuery
 
